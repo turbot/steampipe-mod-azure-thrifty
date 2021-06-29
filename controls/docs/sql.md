@@ -1,4 +1,4 @@
-## Thrifty Storage Benchmark
+## Thrifty SQL Benchmark
 
 Thrifty developers reviews SQL old databses and is removed unless there is a business need to retain them.
 
