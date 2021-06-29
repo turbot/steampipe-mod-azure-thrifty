@@ -6,7 +6,7 @@ locals {
 
 benchmark "sql" {
   title         = "SQL Checks"
-  description   = "Thrifty developers checks SQL old databses."
+  description   = "Thrifty developers checks SQL old databases."
   documentation = file("./controls/docs/sql.md")
   tags          = local.sql_common_tags
   children = [

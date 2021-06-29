@@ -217,7 +217,7 @@ control "compute_disk_unattached" {
         else 'ok'
       end as status,
       case
-        when disk.disk_state = 'Unattached' then  disk.title || ' has no attachments.'
+        when disk.disk_state = 'Unattached' then disk.title || ' has no attachments.'
         else disk.title || ' has attachments.'
       end as reason,
       disk.resource_group,
