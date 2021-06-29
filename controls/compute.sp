@@ -14,10 +14,10 @@ benchmark "compute" {
     control.compute_disk_high_iops,
     control.compute_disk_large,
     control.compute_disk_low_iops,
+    control.compute_disk_snapshot_storage_standard,
     control.compute_disk_standard_hdd,
-    control.compute_disk_snapshots_storage_standard,
+    control.compute_disk_unattached,
     control.compute_snapshot_age_90,
-    control.compute_unattached_disk,
     control.compute_virtual_machine_long_running,
   ]
 }
@@ -63,8 +63,8 @@ control "compute_disk_attached_stopped_instance" {
 }
 
 control "compute_disk_high_iops" {
-  title       = "Compute disks with high IOPS should be reviewed"
-  description = "High IOPS io1 and io2 volumes are costly and usage should be reviewed."
+  title       = "Disks with high IOPS should be reviewed"
+  description = "High IOPS disks are costly and usage should be reviewed."
   severity    = "low"
 
   sql = <<-EOT
@@ -91,7 +91,7 @@ control "compute_disk_high_iops" {
 }
 
 control "compute_disk_large" {
-  title       = "Compute disks with over 100 GB should be resized if too large"
+  title       = "Disks with over 100 GB should be resized if too large"
   description = "Large compute disks are unusual, expensive and should be reviewed."
   severity    = "low"
 
@@ -118,8 +118,8 @@ control "compute_disk_large" {
 }
 
 control "compute_disk_low_iops" {
-  title       = "Compute disks with low IOPS should be reviewed"
-  description = "Compute disks with low IOPS should be reviewed"
+  title       = "Disks with low IOPS should be reviewed"
+  description = "Compute disks with low IOPS should be reviewed."
   severity    = "low"
 
   sql = <<-EOT
@@ -129,7 +129,7 @@ control "compute_disk_low_iops" {
         when disk_iops_read_write <= 3000 then 'alarm'
         else 'ok'
       end as status,
-      disk.title || ' has ' || disk_iops_read_write || ' iops.' as reason,
+      disk.title || ' has ' || disk_iops_read_write || ' IOPS.' as reason,
       disk.resource_group,
       sub.display_name as subscription
     from
@@ -144,8 +144,38 @@ control "compute_disk_low_iops" {
   })
 }
 
+control "compute_disk_snapshot_storage_standard" {
+  title       = "Disks snapshots storage type should be standard"
+  description = "Use standard storage type for compute disks snapshots to save cost."
+  severity    = "low"
+
+  sql = <<-EOT
+    select
+      ss.id as resource,
+      case
+        when ss.sku_tier = 'Standard' then 'ok'
+        else 'alarm'
+      end as status,
+      case
+        when ss.sku_tier = 'Standard' then ss.title || ' has storage type ' || ss.sku_tier || '.'
+        else ss.title || ' has storage type ' || ss.sku_tier || '.'
+      end as reason,
+      ss.resource_group,
+      sub.display_name as subscription
+    from
+      azure_compute_snapshot ss,
+      azure_subscription sub
+    where
+      ss.subscription_id = sub.subscription_id;
+  EOT
+
+  tags = merge(local.compute_common_tags, {
+    class = "deprecated"
+  })
+}
+
 control "compute_disk_standard_hdd" {
-  title       = "Compute disk type should be standard HDD"
+  title       = "Disk type should be standard HDD"
   description = "Use standard HDD for backup and non critical, infrequent access."
   severity    = "low"
 
@@ -174,6 +204,36 @@ control "compute_disk_standard_hdd" {
   })
 }
 
+control "compute_disk_unattached" {
+  title       = "Unused disks should be removed"
+  description = "Unattached compute disks are charged by Azure, they should be removed unless there is a business need to retain them."
+  severity    = "low"
+
+  sql = <<-EOT
+    select
+      disk.id as resource,
+      case
+        when disk.disk_state = 'Unattached' then 'alarm'
+        else 'ok'
+      end as status,
+      case
+        when disk.disk_state = 'Unattached' then  disk.title || ' has no attachments.'
+        else disk.title || ' has attachments.'
+      end as reason,
+      disk.resource_group,
+      sub.display_name as subscription
+    from
+      azure_compute_disk disk,
+      azure_subscription sub
+    where
+      sub.subscription_id = disk.subscription_id;
+  EOT
+
+  tags = merge(local.compute_common_tags, {
+    class = "unused"
+  })
+}
+
 control "compute_snapshot_age_90" {
   title       = "Snapshots created over 90 days ago should be deleted if not required"
   description = "Old snapshots are likely unneeded and costly to maintain."
@@ -198,37 +258,7 @@ control "compute_snapshot_age_90" {
   EOT
 
   tags = merge(local.compute_common_tags, {
-    class = "deprecated"
-  })
-}
-
-control "compute_unattached_disk" {
-  title       = "Unattached compute disks should be removed"
-  description = "Unattached compute disks are charged by GCP, they should be removed unless there is a business need to retain them."
-  severity    = "low"
-
-  sql = <<-EOT
-    select
-      disk.id as resource,
-      case
-        when disk.disk_state = 'Unattached' then 'alarm'
-        else 'ok'
-      end as status,
-      case
-        when disk.disk_state = 'Unattached' then  disk.title || ' has no attachments.'
-        else disk.title || ' has attachments.'
-      end as reason,
-      disk.resource_group,
-      sub.display_name as subscription
-    from
-      azure_compute_disk disk,
-      azure_subscription sub
-    where
-      sub.subscription_id = disk.subscription_id;
-  EOT
-
-  tags = merge(local.compute_common_tags, {
-    class = "deprecated"
+    class = "unused"
   })
 }
 
@@ -254,36 +284,6 @@ control "compute_virtual_machine_long_running" {
       azure_subscription sub
     where
       vm.power_state in ('running', 'starting') and s ->> 'time' is not null;
-  EOT
-
-  tags = merge(local.compute_common_tags, {
-    class = "deprecated"
-  })
-}
-
-control "compute_disk_snapshots_storage_standard" {
-  title       = "Compute disks snapshots storage type should be standard"
-  description = "Use standard storage type for compute disks snapshots to save cost."
-  severity    = "low"
-
-  sql = <<-EOT
-    select
-      ss.id as resource,
-      case
-        when ss.sku_tier = 'Standard' then 'ok'
-        else 'alarm'
-      end as status,
-      case
-        when ss.sku_tier = 'Standard' then ss.title || ' has storage type ' || ss.sku_tier || '.'
-        else ss.title || ' has storage type ' || ss.sku_tier || '.'
-      end as reason,
-      ss.resource_group,
-      sub.display_name as subscription
-    from
-      azure_compute_snapshot ss,
-      azure_subscription sub
-    where
-      ss.subscription_id = sub.subscription_id;
   EOT
 
   tags = merge(local.compute_common_tags, {

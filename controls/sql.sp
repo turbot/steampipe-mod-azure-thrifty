@@ -39,6 +39,6 @@ control "sql_database_age_90" {
   EOT
 
   tags = merge(local.compute_common_tags, {
-    class = "deprecated"
+    class = "unused"
   })
 }
