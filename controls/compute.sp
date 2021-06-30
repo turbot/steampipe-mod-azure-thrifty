@@ -279,9 +279,9 @@ control "compute_virtual_machine_long_running" {
       vm.resource_group,
       sub.display_name as subscription
     from
-      azure_compute_virtual_machine vm,
+      azure_compute_virtual_machine as vm,
       jsonb_array_elements(statuses) as s,
-      azure_subscription sub
+      azure_subscription as sub
     where
       vm.power_state in ('running', 'starting') and s ->> 'time' is not null;
   EOT

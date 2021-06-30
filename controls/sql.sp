@@ -33,7 +33,7 @@ control "sql_database_age_90" {
       sub.display_name as subscription
     from
       azure_sql_database as db,
-      azure_subscription sub
+      azure_subscription as sub
     where
       db.name != 'master' and db.subscription_id = sub.subscription_id;
   EOT
