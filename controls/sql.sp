@@ -10,13 +10,13 @@ benchmark "sql" {
   documentation = file("./controls/docs/sql.md")
   tags          = local.sql_common_tags
   children = [
-    control.sql_database_age_90,
+    control.sql_database_long_running_reserved_capacity,
   ]
 }
 
-control "sql_database_age_90" {
-  title       = "SQL databases should have reserved capacity purchased for them"
-  description = "Long running SQL databases should be associated with reserved capacity."
+control "sql_database_long_running_reserved_capacity" {
+  title       = "Long running SQL databases should have reserved capacity purchased for them"
+  description = "Purchasing reserved capacity for long running SQL databases provides significant discounts."
   severity    = "low"
 
   sql = <<-EOT

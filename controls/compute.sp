@@ -10,10 +10,9 @@ benchmark "compute" {
   documentation = file("./controls/docs/compute.md")
   tags          = local.compute_common_tags
   children = [
-    control.compute_disk_attached_stopped_instance,
+    control.compute_disk_attached_stopped_virtual_machine,
     control.compute_disk_high_iops,
     control.compute_disk_large,
-    control.compute_disk_low_iops,
     control.compute_disk_snapshot_storage_standard,
     control.compute_disk_unattached,
     control.compute_snapshot_age_90,
@@ -21,15 +20,15 @@ benchmark "compute" {
   ]
 }
 
-control "compute_disk_attached_stopped_instance" {
-  title       = "Disks attached to stopped instances should be reviewed"
-  description = "Instances that are stopped may no longer need any disks attached."
+control "compute_disk_attached_stopped_virtual_machine" {
+  title       = "Disks attached to stopped virtual machines should be reviewed"
+  description = "Virtual machines that are stopped may no longer need any disks attached."
   severity    = "low"
 
   sql = <<-EOT
     with attached_disk_with_vm as (
       select
-        power_state as instance_state,
+        power_state as virtual_machine_state,
         os_disk_name,
         jsonb_agg(data_disk ->> 'name') as data_disk_names
       from
@@ -41,12 +40,12 @@ control "compute_disk_attached_stopped_instance" {
       d.id as resource,
       case
         when d.disk_state = 'Unattached' then 'skip'
-        when m.instance_state = 'running' then 'ok'
+        when m.virtual_machine_state = 'running' then 'ok'
         else 'alarm'
       end as status,
       case
         when d.disk_state = 'Unattached' then d.name || ' not attached to virtual machine.'
-        when m.instance_state = 'running' then d.name || ' attached to running virtual machine.'
+        when m.virtual_machine_state = 'running' then d.name || ' attached to running virtual machine.'
         else d.name || ' not attached to running virtual machine.'
       end as reason,
       d.resource_group,
@@ -63,7 +62,7 @@ control "compute_disk_attached_stopped_instance" {
 }
 
 control "compute_disk_high_iops" {
-  title       = "Disks with high IOPS should be reviewed"
+  title       = "Disks with high IOPS should be resized if too large"
   description = "High IOPS disks are costly and usage should be reviewed."
   severity    = "low"
 
@@ -92,7 +91,7 @@ control "compute_disk_high_iops" {
 
 control "compute_disk_large" {
   title       = "Disks with over 100 GB should be resized if too large"
-  description = "Large compute disks are unusual, expensive and should be reviewed."
+  description = "Large disks are unusual, expensive and should be reviewed."
   severity    = "low"
 
   sql = <<-EOT
@@ -117,36 +116,9 @@ control "compute_disk_large" {
   })
 }
 
-control "compute_disk_low_iops" {
-  title       = "Disks with low IOPS should be reviewed"
-  description = "Compute disks with low IOPS should be reviewed."
-  severity    = "low"
-
-  sql = <<-EOT
-    select
-      disk.id as resource,
-      case
-        when disk_iops_read_write <= 1500 then 'alarm'
-        else 'ok'
-      end as status,
-      disk.title || ' has ' || disk_iops_read_write || ' IOPS.' as reason,
-      disk.resource_group,
-      sub.display_name as subscription
-    from
-      azure_compute_disk as disk,
-      azure_subscription as sub
-    where
-      sub.subscription_id = disk.subscription_id;
-  EOT
-
-  tags = merge(local.compute_common_tags, {
-    class = "deprecated"
-  })
-}
-
 control "compute_disk_snapshot_storage_standard" {
-  title       = "Disks snapshots storage type should be standard"
-  description = "Use standard storage type for compute disks snapshots to save cost."
+  title       = "Disks should use standard snapshots"
+  description = "Use standard storage instead of premium storage for managed disk snapshots to save 60% on costs."
   severity    = "low"
 
   sql = <<-EOT
@@ -176,7 +148,7 @@ control "compute_disk_snapshot_storage_standard" {
 
 control "compute_disk_unattached" {
   title       = "Unused disks should be removed"
-  description = "Unattached compute disks are charged by Azure, they should be removed unless there is a business need to retain them."
+  description = "Unattached disks are charged by Azure, they should be removed unless there is a business need to retain them."
   severity    = "low"
 
   sql = <<-EOT
@@ -234,7 +206,7 @@ control "compute_snapshot_age_90" {
 
 control "compute_virtual_machine_long_running" {
   title       = "Long running virtual machines should be reviewed"
-  description = "Virtual machines should ideally be ephemeral and rehydrated frequently, check why these instances have been running for so long."
+  description = "Virtual machines should ideally be ephemeral and rehydrated frequently, check why these virtual machines have been running for so long."
   severity    = "low"
 
   sql = <<-EOT

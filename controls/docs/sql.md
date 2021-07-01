@@ -4,4 +4,4 @@ Thrifty developers checks long running SQL databases should be associated with r
 
 ### Default Thresholds
 
-- [SQL database age threshold (90 Days)]
+- SQL database age threshold (90 days)
