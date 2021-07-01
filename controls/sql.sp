@@ -6,7 +6,7 @@ locals {
 
 benchmark "sql" {
   title         = "SQL Checks"
-  description   = "Thrifty developers checks SQL old databases."
+  description   = "Thrifty developers checks long running SQL databases should be associated with reserved capacity."
   documentation = file("./controls/docs/sql.md")
   tags          = local.sql_common_tags
   children = [
@@ -15,8 +15,8 @@ benchmark "sql" {
 }
 
 control "sql_database_age_90" {
-  title       = "SQL databases created over 90 days ago should be deleted if not required"
-  description = "Old SQL database are likely unneeded and costly to maintain."
+  title       = "SQL databases should have reserved capacity purchased for them"
+  description = "Long running SQL databases should be associated with reserved capacity."
   severity    = "low"
 
   sql = <<-EOT

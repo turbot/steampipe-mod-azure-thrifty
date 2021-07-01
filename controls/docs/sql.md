@@ -1,6 +1,6 @@
 ## Thrifty SQL Benchmark
 
-Thrifty developers reviews SQL old databases and is removed unless there is a business need to retain them.
+Thrifty developers checks long running SQL databases should be associated with reserved capacity.
 
 ### Default Thresholds
 
