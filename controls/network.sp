@@ -33,8 +33,8 @@ control "network_public_ip_unattached" {
       ip.resource_group,
       sub.display_name as subscription
     from
-      azure_public_ip ip,
-      azure_subscription sub
+      azure_public_ip as ip,
+      azure_subscription as sub
     where
       sub.subscription_id = ip.subscription_id;
   EOT

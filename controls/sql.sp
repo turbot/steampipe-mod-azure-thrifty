@@ -23,11 +23,11 @@ control "sql_database_age_90" {
     select
       db.id as resource,
       case
-        when date_part('day', now()-creation_date) > 90 then 'alarm'
-        when date_part('day', now()-creation_date) > 30 then 'info'
+        when date_part('day', now() - creation_date) > 90 then 'alarm'
+        when date_part('day', now() - creation_date) > 30 then 'info'
         else 'ok'
       end as status,
-      db.title || ' has been in use for ' || date_part('day', now()-creation_date) || ' days.'
+      db.title || ' has been in use for ' || date_part('day', now() - creation_date) || ' days.'
       as reason,
       db.resource_group,
       sub.display_name as subscription

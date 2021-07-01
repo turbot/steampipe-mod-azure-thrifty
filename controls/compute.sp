@@ -34,7 +34,8 @@ control "compute_disk_attached_stopped_instance" {
         os_disk_name,
         jsonb_agg(data_disk ->> 'name') as data_disk_names
       from
-        azure_compute_virtual_machine left join jsonb_array_elements(data_disks) as data_disk on true
+        azure_compute_virtual_machine
+        left join jsonb_array_elements(data_disks) as data_disk on true
       group by name, os_disk_name, power_state
     )
     select
@@ -71,7 +72,7 @@ control "compute_disk_high_iops" {
     select
       disk.id as resource,
       case
-        when disk_iops_read_write > 32000 then 'alarm'
+        when disk_iops_read_write > 16000 then 'alarm'
         else 'ok'
       end as status,
       disk.title || ' has ' || disk_iops_read_write || ' IOPS.'
@@ -79,8 +80,8 @@ control "compute_disk_high_iops" {
       disk.resource_group,
       sub.display_name as subscription
     from
-      azure_compute_disk disk,
-      azure_subscription sub
+      azure_compute_disk as disk,
+      azure_subscription as sub
     where
       sub.subscription_id = disk.subscription_id;
   EOT
@@ -102,12 +103,12 @@ control "compute_disk_large" {
         when disk_size_gb <= 100 then 'ok'
         else 'alarm'
       end as status,
-      disk.title || ' is ' || disk_size_gb || 'GB.' as reason,
+      disk.title || ' is ' || disk_size_gb || ' GB.' as reason,
       resource_group,
       sub.display_name as subscription
     from
-      azure_compute_disk disk,
-      azure_subscription sub
+      azure_compute_disk as disk,
+      azure_subscription as sub
     where
       sub.subscription_id = disk.subscription_id;
   EOT
@@ -126,15 +127,15 @@ control "compute_disk_low_iops" {
     select
       disk.id as resource,
       case
-        when disk_iops_read_write <= 3000 then 'alarm'
+        when disk_iops_read_write <= 1500 then 'alarm'
         else 'ok'
       end as status,
       disk.title || ' has ' || disk_iops_read_write || ' IOPS.' as reason,
       disk.resource_group,
       sub.display_name as subscription
     from
-      azure_compute_disk disk,
-      azure_subscription sub
+      azure_compute_disk as disk,
+      azure_subscription as sub
     where
       sub.subscription_id = disk.subscription_id;
   EOT
@@ -163,8 +164,8 @@ control "compute_disk_snapshot_storage_standard" {
       ss.resource_group,
       sub.display_name as subscription
     from
-      azure_compute_snapshot ss,
-      azure_subscription sub
+      azure_compute_snapshot as ss,
+      azure_subscription as sub
     where
       ss.subscription_id = sub.subscription_id;
   EOT
@@ -193,8 +194,8 @@ control "compute_disk_standard_hdd" {
       disk.resource_group,
       sub.display_name as subscription
     from
-      azure_compute_disk disk,
-      azure_subscription sub
+      azure_compute_disk as disk,
+      azure_subscription as sub
     where
       sub.subscription_id = disk.subscription_id;
   EOT
@@ -223,8 +224,8 @@ control "compute_disk_unattached" {
       disk.resource_group,
       sub.display_name as subscription
     from
-      azure_compute_disk disk,
-      azure_subscription sub
+      azure_compute_disk as disk,
+      azure_subscription as sub
     where
       sub.subscription_id = disk.subscription_id;
   EOT
@@ -246,13 +247,13 @@ control "compute_snapshot_age_90" {
         when time_created > current_timestamp - interval '90 days' then 'ok'
         else 'alarm'
       end as status,
-      s.title || ' created at ' || time_created || ' (' || date_part('day', now()-time_created) || ' days).'
+      s.title || ' created at ' || time_created || ' (' || date_part('day', now() - time_created) || ' days).'
       as reason,
       resource_group,
       sub.display_name as subscription
     from
-      azure_compute_snapshot s,
-      azure_subscription sub
+      azure_compute_snapshot as s,
+      azure_subscription as sub
     where
       sub.subscription_id = s.subscription_id;
   EOT
