@@ -27,8 +27,8 @@ control "network_public_ip_unattached" {
         else 'ok'
       end as status,
       case
-        when ip.ip_configuration_id is null then ip.title  || ' has no association.'
-        else ip.title || ' associated with ' || split_part(ip.ip_configuration_id, '/', 8) || ' ' || split_part(ip.ip_configuration_id, '/', 9) || '.'
+        when ip.ip_configuration_id is null then ip.title  || ' has no associations.'
+        else ip.title || ' associated with network interface ' || split_part(ip.ip_configuration_id, '/', 9) || '.'
       end as reason,
       ip.resource_group,
       sub.display_name as subscription

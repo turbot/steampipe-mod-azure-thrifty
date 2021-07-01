@@ -70,7 +70,7 @@ control "compute_disk_high_iops" {
     select
       disk.id as resource,
       case
-        when disk_iops_read_write > 16000 then 'alarm'
+        when disk_iops_read_write > 2000 then 'alarm'
         else 'ok'
       end as status,
       disk.title || ' has ' || disk_iops_read_write || ' IOPS.'

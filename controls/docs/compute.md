@@ -4,7 +4,7 @@ Thrifty developers eliminate their unused and under-utilized compute instances. 
 
 ### Default Thresholds
 
-- Disk high IOPS threshold (16,000 IOPS)
+- Disk high IOPS threshold (2,000 IOPS)
 - Disks that are large (> 100 GB)
 - Snapshot age threshold (90 days)
 - Long running virtual machine threshold (90 days)
