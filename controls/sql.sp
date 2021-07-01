@@ -27,7 +27,7 @@ control "sql_database_age_90" {
         when date_part('day', now() - creation_date) > 30 then 'info'
         else 'ok'
       end as status,
-      db.title || ' has been in use for ' || date_part('day', now() - creation_date) || ' days.'
+      db.title || ' has been in use for ' || date_part('day', now() - creation_date) || ' day(s).'
       as reason,
       db.resource_group,
       sub.display_name as subscription
