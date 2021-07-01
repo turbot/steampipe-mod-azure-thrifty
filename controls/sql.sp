@@ -15,8 +15,8 @@ benchmark "sql" {
 }
 
 control "sql_database_age_90" {
-  title       = "Old SQL database should be reviewed"
-  description = "Old SQL database should be reviewed and checked if needed."
+  title       = "SQL databases created over 90 days ago should be deleted if not required"
+  description = "Old SQL database are likely unneeded and costly to maintain."
   severity    = "low"
 
   sql = <<-EOT

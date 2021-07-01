@@ -16,7 +16,7 @@ benchmark "network" {
 
 control "network_public_ip_unattached" {
   title       = "Unattached external IP addresses should be removed"
-  description = "Unattached external IPs are charged, they should be released."
+  description = "Unattached external IPs cost money and should be released."
   severity    = "low"
 
   sql = <<-EOT
