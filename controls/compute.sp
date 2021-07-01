@@ -15,7 +15,6 @@ benchmark "compute" {
     control.compute_disk_large,
     control.compute_disk_low_iops,
     control.compute_disk_snapshot_storage_standard,
-    control.compute_disk_standard_hdd,
     control.compute_disk_unattached,
     control.compute_snapshot_age_90,
     control.compute_virtual_machine_long_running,
@@ -168,36 +167,6 @@ control "compute_disk_snapshot_storage_standard" {
       azure_subscription as sub
     where
       ss.subscription_id = sub.subscription_id;
-  EOT
-
-  tags = merge(local.compute_common_tags, {
-    class = "deprecated"
-  })
-}
-
-control "compute_disk_standard_hdd" {
-  title       = "Disk type should be standard HDD"
-  description = "Use standard HDD for backup and non critical, infrequent access."
-  severity    = "low"
-
-  sql = <<-EOT
-    select
-      disk.id as resource,
-      case
-        when disk.sku_name = 'Standard_LRS' then 'ok'
-        else 'alarm'
-      end as status,
-      case
-        when disk.sku_name = 'Standard_LRS' then disk.title || ' has type ' || disk.sku_tier || ' HDD.'
-        else disk.title || ' has type ' || disk.sku_tier || ' SSD.'
-      end as reason,
-      disk.resource_group,
-      sub.display_name as subscription
-    from
-      azure_compute_disk as disk,
-      azure_subscription as sub
-    where
-      sub.subscription_id = disk.subscription_id;
   EOT
 
   tags = merge(local.compute_common_tags, {
