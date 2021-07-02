@@ -8,7 +8,7 @@ Be Thrifty on Azure! This mod checks for unused resources and opportunities to o
 
 ## References
 
-[Azure](https://azure.amazon.com/) provides on-demand cloud computing platforms and APIs to authenticated customers on a metered pay-as-you-go basis.
+[Azure](https://azure.microsoft.com) provides on-demand cloud computing platforms and APIs to authenticated customers on a metered pay-as-you-go basis.
 
 [Steampipe](https://steampipe.io) is an open source CLI to instantly query cloud APIs using SQL.
 
@@ -40,7 +40,7 @@ steampipe check all
 
 Run a specific control:
 ```shell
-steampipe check control.instances_with_low_utilization
+steampipe check control.compute_disk_unattached
 ```
 
 ### Credentials

@@ -34,12 +34,15 @@ steampipe check all
 
 Your can also run a specific controls:
 ```shell
-steampipe check control.instances_with_low_utilization
+steampipe check control.compute_disk_unattached
 ```
 
 ## Current Thrifty Checks
 
-- TODO
+- Long running **Compute Virtual Machines**
+- Unused and oversized **Compute Disks** and **Snapshots**
+- Unattached **Network Public IPs**
+- Long running **SQL Databases**
 - [#TODO List](https://github.com/turbot/steampipe-mod-azure-thrifty/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 
 **Use introspection to view the available controls:**:
