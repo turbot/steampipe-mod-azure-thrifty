@@ -30,7 +30,7 @@ Run all benchmarks:
 steampipe check all
 ```
 
-![image](https://github.com/turbot/steampipe-mod-azure-thrifty/blob/main/docs/thrifty-output.png?raw=true)
+![image](https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure-thrifty-console-graphic.png)
 
 Your can also run a specific controls:
 ```shell
