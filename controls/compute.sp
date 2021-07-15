@@ -268,7 +268,7 @@ control "compute_virtual_machine_low_utilization" {
       v.resource_group,
       sub.display_name as subscription
     from
-      azure_compute_virtual_machine v
+      azure_compute_virtual_machine as v
       left join compute_virtual_machine_utilization as u on u.name = v.name
       left join azure_subscription as sub on sub.subscription_id = v.subscription_id;
   EOT
@@ -329,7 +329,7 @@ control "compute_disk_low_usage" {
       resource_group,
       display_name as subscription
     from
-      disk_usage u left join azure_compute_disk as d on u.name = d.name
+      disk_usage as u left join azure_compute_disk as d on u.name = d.name
       left join azure_subscription as sub on sub.subscription_id = d.subscription_id;
   EOT
 
