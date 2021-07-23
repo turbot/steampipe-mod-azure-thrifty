@@ -13,10 +13,12 @@ benchmark "compute" {
     control.compute_disk_attached_stopped_virtual_machine,
     control.compute_disk_high_iops,
     control.compute_disk_large,
+    control.compute_disk_low_usage,
     control.compute_disk_snapshot_storage_standard,
     control.compute_disk_unattached,
     control.compute_snapshot_age_90,
     control.compute_virtual_machine_long_running,
+    control.compute_virtual_machine_low_utilization,
   ]
 }
 
@@ -230,5 +232,108 @@ control "compute_virtual_machine_long_running" {
 
   tags = merge(local.compute_common_tags, {
     class = "deprecated"
+  })
+}
+
+control "compute_virtual_machine_low_utilization" {
+  title       = "Compute virtual machines with low CPU utilization should be reviewed"
+  description = "Resize or eliminate under utilized virtual machines."
+  severity    = "low"
+
+  sql = <<-EOT
+    with compute_virtual_machine_utilization as (
+      select
+        name,
+        round(cast(sum(maximum)/count(maximum) as numeric), 1) as avg_max,
+        count(maximum) as days
+      from
+        azure_compute_virtual_machine_metric_cpu_utilization_daily
+      where
+        date_part('day', now() - timestamp) <=30
+      group by
+        name
+    )
+    select
+      v.id as resource,
+      case
+        when avg_max is null then 'error'
+        when avg_max < 20 then 'alarm'
+        when avg_max < 35 then 'info'
+        else 'ok'
+      end as status,
+      case
+        when avg_max is null then 'Monitor metrics not available for ' || v.title || '.'
+        else v.title || ' averaging ' || avg_max || '% max utilization over the last ' || days || ' days.'
+      end as reason,
+      v.resource_group,
+      sub.display_name as subscription
+    from
+      azure_compute_virtual_machine as v
+      left join compute_virtual_machine_utilization as u on u.name = v.name
+      left join azure_subscription as sub on sub.subscription_id = v.subscription_id;
+  EOT
+
+  tags = merge(local.compute_common_tags, {
+    class = "unused"
+  })
+}
+
+control "compute_disk_low_usage" {
+  title       = "Compute disks with low usage should be reviewed"
+  description = "Disks that are unused should be archived and deleted."
+  severity    = "low"
+
+  sql = <<-EOT
+    with disk_usage as (
+      select
+        name,
+        resource_group
+        subscription_id,
+        round(avg(max)) as avg_max,
+        count(max) as days
+      from
+        (
+          select
+            name,
+            resource_group,
+            subscription_id,
+            cast(maximum as numeric) as max
+          from
+            azure_compute_disk_metric_read_ops_daily
+          where
+            date_part('day', now() - timestamp) <= 30
+          union all
+          select
+            name,
+            resource_group,
+            subscription_id,
+            cast(maximum as numeric) as max
+          from
+            azure_compute_disk_metric_write_ops_daily
+          where
+            date_part('day', now() - timestamp) <= 30
+        ) as read_and_write_ops
+      group by
+        name,
+        resource_group,
+        subscription_id
+    )
+    select
+      d.id as resource,
+      case
+        when avg_max <= 100 then 'alarm'
+        when avg_max <= 500 then 'info'
+        else 'ok'
+      end as status,
+      d.name || ' averaging ' || avg_max || ' read and write ops over the last ' || days / 2 || ' days.' as reason,
+      resource_group,
+      display_name as subscription
+    from
+      disk_usage as u left join azure_compute_disk as d on u.name = d.name
+      left join azure_subscription as sub on sub.subscription_id = d.subscription_id;
+  EOT
+
+  tags = merge(local.compute_common_tags, {
+    class = "unused"
   })
 }
