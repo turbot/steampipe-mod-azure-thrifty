@@ -11,7 +11,7 @@ brew tap turbot/tap
 brew install steampipe
 
 steampipe -v
-steampipe version 0.5.1
+steampipe version 0.7.0
 ```
 
 Install the Azure plugin
@@ -22,7 +22,7 @@ steampipe plugin install azure
 Clone this repo and move into the directory:
 ```sh
 git clone git@github.com:turbot/steampipe-mod-azure-thrifty
-cd steampipe-mod-azure-compliance
+cd steampipe-mod-azure-thrifty
 ```
 
 Run all benchmarks:
@@ -70,12 +70,12 @@ Click on the GitHub Fork Widget. (Don't forget to :star: the repo!)
 
 ```sh
 git clone git@github.com:YOUR-USERNAME/steampipe-mod-azure-thrifty
-cd steampipe-mod-azure-compliance
+cd steampipe-mod-azure-thrifty
 ```
 
 Thanks for getting involved! We would love to have you [join our Slack community](https://join.slack.com/t/steampipe/shared_invite/zt-oij778tv-lYyRTWOTMQYBVAbtPSWs3g) and hang out with other Mod developers.
 
-Please see the [contribution guidelines](https://github.com/turbot/steampipe/blob/main/CONTRIBUTING.md) and our [code of conduct](https://github.com/turbot/steampipe/blob/main/CODE_OF_CONDUCT.md). All contributions are subject to the [Apache 2.0 open source license](https://github.com/turbot/steampipe-mod-azure-compliance/blob/main/LICENSE).
+Please see the [contribution guidelines](https://github.com/turbot/steampipe/blob/main/CONTRIBUTING.md) and our [code of conduct](https://github.com/turbot/steampipe/blob/main/CODE_OF_CONDUCT.md). All contributions are subject to the [Apache 2.0 open source license](https://github.com/turbot/steampipe-mod-azure-thrifty/blob/main/LICENSE).
 
 `help wanted` issues:
 - [Steampipe](https://github.com/turbot/steampipe/labels/help%20wanted)
