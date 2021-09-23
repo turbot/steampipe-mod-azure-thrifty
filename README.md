@@ -21,7 +21,7 @@ steampipe plugin install azure
 
 Clone this repo and move into the directory:
 ```sh
-git clone git@github.com:turbot/steampipe-mod-azure-thrifty
+git clone https://github.com/turbot/steampipe-mod-azure-thrifty.git
 cd steampipe-mod-azure-thrifty
 ```
 
