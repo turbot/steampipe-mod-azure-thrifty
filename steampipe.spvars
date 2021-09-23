@@ -1,0 +1,9 @@
+# Compute
+compute_disk_max_iops = 2000
+compute_disk_max_size_gb = 100
+compute_snapshot_age_max_days = 90
+compute_running_vm_age_max_days = 90
+
+# SQL
+sql_database_age_max_days = 90
+sql_database_age_warning_days = 30

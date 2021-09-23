@@ -1,3 +1,23 @@
+variable "compute_disk_max_iops" {
+  type        = number
+  description = "The maximum IOPS allowed for disks."
+}
+
+variable "compute_disk_max_size_gb" {
+  type        = number
+  description = "The maximum size in GB allowed for disks."
+}
+
+variable "compute_running_vm_age_max_days" {
+  type        = number
+  description = "The maximum number of days a virtual machine can be running for."
+}
+
+variable "compute_snapshot_age_max_days" {
+  type        = number
+  description = "The maximum number of days a snapshot can be retained for."
+}
+
 locals {
   compute_common_tags = merge(local.thrifty_common_tags, {
     service = "compute"
@@ -16,7 +36,7 @@ benchmark "compute" {
     control.compute_disk_low_usage,
     control.compute_disk_snapshot_storage_standard,
     control.compute_disk_unattached,
-    control.compute_snapshot_age_90,
+    control.compute_snapshot_age,
     control.compute_virtual_machine_long_running,
     control.compute_virtual_machine_low_utilization,
   ]
@@ -72,7 +92,7 @@ control "compute_disk_high_iops" {
     select
       disk.id as resource,
       case
-        when disk_iops_read_write > 2000 then 'alarm'
+        when disk_iops_read_write > $1 then 'alarm'
         else 'ok'
       end as status,
       disk.title || ' has ' || disk_iops_read_write || ' IOPS.'
@@ -86,13 +106,17 @@ control "compute_disk_high_iops" {
       sub.subscription_id = disk.subscription_id;
   EOT
 
+  param "compute_disk_max_iops" {
+    default = var.compute_disk_max_iops
+  }
+
   tags = merge(local.compute_common_tags, {
     class = "deprecated"
   })
 }
 
 control "compute_disk_large" {
-  title       = "Disks with over 100 GB should be resized if too large"
+  title       = "Disks with over ${var.compute_disk_max_size_gb} GB should be resized if too large"
   description = "Large disks are unusual, expensive and should be reviewed."
   severity    = "low"
 
@@ -100,7 +124,7 @@ control "compute_disk_large" {
     select
       disk.unique_id as resource,
       case
-        when disk_size_gb <= 100 then 'ok'
+        when disk_size_gb <= $1 then 'ok'
         else 'alarm'
       end as status,
       disk.title || ' is ' || disk_size_gb || ' GB.' as reason,
@@ -112,6 +136,10 @@ control "compute_disk_large" {
     where
       sub.subscription_id = disk.subscription_id;
   EOT
+
+  param "compute_disk_max_size_gb" {
+    default = var.compute_disk_max_size_gb
+  }
 
   tags = merge(local.compute_common_tags, {
     class = "deprecated"
@@ -178,8 +206,8 @@ control "compute_disk_unattached" {
   })
 }
 
-control "compute_snapshot_age_90" {
-  title       = "Snapshots created over 90 days ago should be deleted if not required"
+control "compute_snapshot_age" {
+  title       = "Snapshots created over ${var.compute_snapshot_age_max_days} days ago should be deleted if not required"
   description = "Old snapshots are likely unneeded and costly to maintain."
   severity    = "low"
 
@@ -187,7 +215,7 @@ control "compute_snapshot_age_90" {
     select
       s.unique_id as resource,
       case
-        when time_created > current_timestamp - interval '90 days' then 'ok'
+        when time_created > current_timestamp - interval '$1 days' then 'ok'
         else 'alarm'
       end as status,
       s.title || ' created at ' || time_created || ' (' || date_part('day', now() - time_created) || ' days).'
@@ -200,6 +228,10 @@ control "compute_snapshot_age_90" {
     where
       sub.subscription_id = s.subscription_id;
   EOT
+
+  param "compute_snapshot_age_max_days" {
+    default = var.compute_snapshot_age_max_days
+  }
 
   tags = merge(local.compute_common_tags, {
     class = "unused"
@@ -215,7 +247,7 @@ control "compute_virtual_machine_long_running" {
     select
       vm.id as resource,
       case
-        when date_part('day', now() - (s ->> 'time') :: timestamptz) > 90 then 'alarm'
+        when date_part('day', now() - (s ->> 'time') :: timestamptz) > $1 then 'alarm'
         else 'ok'
       end as status,
       vm.title || ' has been running for ' || date_part('day', now() - (s ->> 'time') :: timestamptz) || ' days.'
@@ -229,6 +261,10 @@ control "compute_virtual_machine_long_running" {
     where
       vm.power_state in ('running', 'starting') and s ->> 'time' is not null;
   EOT
+
+  param "compute_running_vm_age_max_days" {
+    default = var.compute_running_vm_age_max_days
+  }
 
   tags = merge(local.compute_common_tags, {
     class = "deprecated"
