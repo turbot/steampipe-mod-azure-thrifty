@@ -10,12 +10,12 @@ variable "compute_disk_max_size_gb" {
 
 variable "compute_running_vm_age_max_days" {
   type        = number
-  description = "The maximum number of days a virtual machine can be running for."
+  description = "The maximum number of days a virtual machine is allowed to run."
 }
 
 variable "compute_snapshot_age_max_days" {
   type        = number
-  description = "The maximum number of days a snapshot can be retained for."
+  description = "The maximum number of days a snapshot can be retained."
 }
 
 locals {

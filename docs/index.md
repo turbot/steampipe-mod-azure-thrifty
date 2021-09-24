@@ -14,7 +14,6 @@ Be Thrifty on Azure! This mod checks for unused resources and opportunities to o
 
 [Steampipe Mods](https://steampipe.io/docs/reference/mod-resources#mod) are collections of `named queries`, and codified `controls` that can be used to test current configuration of your cloud resources against a desired configuration.
 
-
 ## Documentation
 
 - **[Benchmarks and controls →](https://hub.steampipe.io/mods/turbot/azure_thrifty/controls)**
@@ -23,22 +22,26 @@ Be Thrifty on Azure! This mod checks for unused resources and opportunities to o
 ## Get started
 
 Install the Azure plugin with [Steampipe](https://steampipe.io):
+
 ```shell
 steampipe plugin install azure
 ```
 
 Clone:
+
 ```sh
 git clone https://github.com/turbot/steampipe-mod-azure-thrifty.git
 cd steampipe-mod-azure-thrifty
 ```
 
 Run all benchmarks:
+
 ```shell
 steampipe check all
 ```
 
 Run a specific control:
+
 ```shell
 steampipe check control.compute_disk_unattached
 ```
@@ -53,5 +56,5 @@ No extra configuration is required.
 
 ## Get involved
 
-* Contribute: [Help wanted issues](https://github.com/turbot/steampipe-mod-azure-thrifty/labels/help%20wanted)
-* Community: [Slack channel](https://join.slack.com/t/steampipe/shared_invite/zt-oij778tv-lYyRTWOTMQYBVAbtPSWs3g)
+- Contribute: [Help wanted issues](https://github.com/turbot/steampipe-mod-azure-thrifty/labels/help%20wanted)
+- Community: [Slack channel](https://join.slack.com/t/steampipe/shared_invite/zt-oij778tv-lYyRTWOTMQYBVAbtPSWs3g)

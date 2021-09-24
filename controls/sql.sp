@@ -1,11 +1,11 @@
 variable "sql_database_age_max_days" {
   type        = number
-  description = "The maximum number of days a SQL database can be running for."
+  description = "The maximum number of days a SQL database is allowed to run."
 }
 
 variable "sql_database_age_warning_days" {
   type        = number
-  description = "The maximum number of days set as warning threshold for a SQL database."
+  description = "The number of days after which a SQL database set a warning."
 }
 
 locals {
