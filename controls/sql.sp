@@ -45,15 +45,18 @@ control "sql_database_long_running_reserved_capacity" {
       azure_sql_database as db,
       azure_subscription as sub
     where
-      db.name != 'master' and db.subscription_id = sub.subscription_id;
+      db.name != 'master'
+      and db.subscription_id = sub.subscription_id;
   EOT
 
   param "sql_database_age_max_days" {
-    default = var.sql_database_age_max_days
+    description = "The maximum number of days a SQL database is allowed to run."
+    default     = var.sql_database_age_max_days
   }
 
   param "sql_database_age_warning_days" {
-    default = var.sql_database_age_warning_days
+    description = "The number of days after which a SQL database set a warning."
+    default     = var.sql_database_age_warning_days
   }
 
   tags = merge(local.compute_common_tags, {
