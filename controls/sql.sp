@@ -20,7 +20,7 @@ benchmark "sql" {
   documentation = file("./controls/docs/sql.md")
   tags          = local.sql_common_tags
   children = [
-    control.sql_database_long_running_reserved_capacity,
+    control.sql_database_long_running_reserved_capacity
   ]
 }
 

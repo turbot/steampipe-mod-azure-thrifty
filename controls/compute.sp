@@ -58,7 +58,7 @@ benchmark "compute" {
     control.compute_disk_unattached,
     control.compute_snapshot_max_age,
     control.compute_virtual_machine_long_running,
-    control.compute_virtual_machine_low_utilization,
+    control.compute_virtual_machine_low_utilization
   ]
 }
 
