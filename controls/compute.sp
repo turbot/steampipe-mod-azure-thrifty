@@ -1,3 +1,13 @@
+variable "compute_disk_avg_read_write_ops_high" {
+  type        = number
+  description = "The number of average read/write ops required for disks to be considered frequently used. This value should be higher than compute_disk_avg_read_write_ops_low."
+}
+
+variable "compute_disk_avg_read_write_ops_low" {
+  type        = number
+  description = "The number of average read/write ops required for disks to be considered infrequently used. This value should be lower than compute_disk_avg_read_write_ops_high."
+}
+
 variable "compute_disk_iops_high" {
   type        = number
   description = "The maximum IOPS allowed for disks."
@@ -10,17 +20,12 @@ variable "compute_disk_max_size_gb" {
 
 variable "compute_running_vm_age_max_days" {
   type        = number
-  description = "The maximum number of days a virtual machine is allowed to run."
+  description = "The maximum number of days a virtual machines are allowed to run."
 }
 
 variable "compute_snapshot_age_max_days" {
   type        = number
-  description = "The maximum number of days a snapshot can be retained."
-}
-
-variable "compute_vm_avg_cpu_utilization_low" {
-  type        = number
-  description = "The average CPU utilization required for virtual machines to be considered infrequently used. This value should be lower than compute_vm_avg_cpu_utilization_high."
+  description = "The maximum number of days snapshots can be retained."
 }
 
 variable "compute_vm_avg_cpu_utilization_high" {
@@ -28,14 +33,9 @@ variable "compute_vm_avg_cpu_utilization_high" {
   description = "The average CPU utilization required for virtual machines to be considered frequently used. This value should be higher than compute_vm_avg_cpu_utilization_low."
 }
 
-variable "compute_disk_avg_read_write_ops_low" {
+variable "compute_vm_avg_cpu_utilization_low" {
   type        = number
-  description = "The number of average read/write ops required for disks to be considered infrequently used. This value should be lower than compute_disk_avg_read_write_ops_high."
-}
-
-variable "compute_disk_avg_read_write_ops_high" {
-  type        = number
-  description = "The number of average read/write ops required for disks to be considered frequently used. This value should be higher than compute_disk_avg_read_write_ops_low."
+  description = "The average CPU utilization required for virtual machines to be considered infrequently used. This value should be lower than compute_vm_avg_cpu_utilization_high."
 }
 
 locals {

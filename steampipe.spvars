@@ -1,12 +1,12 @@
 # Compute
+compute_disk_avg_read_write_ops_high = 500
+compute_disk_avg_read_write_ops_low  = 100
 compute_disk_iops_high               = 2000
 compute_disk_max_size_gb             = 100
-compute_snapshot_age_max_days        = 90
 compute_running_vm_age_max_days      = 90
-compute_vm_avg_cpu_utilization_low   = 20
+compute_snapshot_age_max_days        = 90
 compute_vm_avg_cpu_utilization_high  = 35
-compute_disk_avg_read_write_ops_low  = 100
-compute_disk_avg_read_write_ops_high = 500
+compute_vm_avg_cpu_utilization_low   = 20
 
 # SQL
 sql_database_age_max_days     = 90
