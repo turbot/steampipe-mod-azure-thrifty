@@ -10,7 +10,7 @@ benchmark "storage" {
   documentation = file("./controls/docs/storage.md")
   tags          = local.storage_common_tags
   children = [
-    control.storage_account_without_lifecycle_policy,
+    control.storage_account_without_lifecycle_policy
   ]
 }
 

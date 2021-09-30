@@ -1,3 +1,13 @@
+variable "sql_database_age_max_days" {
+  type        = number
+  description = "The maximum number of days databases are allowed to run."
+}
+
+variable "sql_database_age_warning_days" {
+  type        = number
+  description = "The number of days databases can be running before sending a warning."
+}
+
 locals {
   sql_common_tags = merge(local.thrifty_common_tags, {
     service = "sql"
@@ -10,7 +20,7 @@ benchmark "sql" {
   documentation = file("./controls/docs/sql.md")
   tags          = local.sql_common_tags
   children = [
-    control.sql_database_long_running_reserved_capacity,
+    control.sql_database_long_running_reserved_capacity
   ]
 }
 
@@ -23,8 +33,8 @@ control "sql_database_long_running_reserved_capacity" {
     select
       db.id as resource,
       case
-        when date_part('day', now() - creation_date) > 90 then 'alarm'
-        when date_part('day', now() - creation_date) > 30 then 'info'
+        when date_part('day', now() - creation_date) > $1 then 'alarm'
+        when date_part('day', now() - creation_date) > $2 then 'info'
         else 'ok'
       end as status,
       db.title || ' has been in use for ' || date_part('day', now() - creation_date) || ' day(s).'
@@ -35,8 +45,19 @@ control "sql_database_long_running_reserved_capacity" {
       azure_sql_database as db,
       azure_subscription as sub
     where
-      db.name != 'master' and db.subscription_id = sub.subscription_id;
+      db.name != 'master'
+      and db.subscription_id = sub.subscription_id;
   EOT
+
+  param "sql_database_age_max_days" {
+    description = "The maximum number of days databases are allowed to run."
+    default     = var.sql_database_age_max_days
+  }
+
+  param "sql_database_age_warning_days" {
+    description = "The number of days databases can be running before sending a warning."
+    default     = var.sql_database_age_warning_days
+  }
 
   tags = merge(local.compute_common_tags, {
     class = "unused"

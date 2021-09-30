@@ -1,3 +1,43 @@
+variable "compute_disk_avg_read_write_ops_high" {
+  type        = number
+  description = "The number of average read/write ops required for disks to be considered frequently used. This value should be higher than compute_disk_avg_read_write_ops_low."
+}
+
+variable "compute_disk_avg_read_write_ops_low" {
+  type        = number
+  description = "The number of average read/write ops required for disks to be considered infrequently used. This value should be lower than compute_disk_avg_read_write_ops_high."
+}
+
+variable "compute_disk_max_iops" {
+  type        = number
+  description = "The maximum IOPS allowed for disks."
+}
+
+variable "compute_disk_max_size_gb" {
+  type        = number
+  description = "The maximum size (GB) allowed for disks."
+}
+
+variable "compute_running_vm_age_max_days" {
+  type        = number
+  description = "The maximum number of days virtual machines are allowed to run."
+}
+
+variable "compute_snapshot_age_max_days" {
+  type        = number
+  description = "The maximum number of days snapshots can be retained."
+}
+
+variable "compute_vm_avg_cpu_utilization_high" {
+  type        = number
+  description = "The average CPU utilization required for virtual machines to be considered frequently used. This value should be higher than compute_vm_avg_cpu_utilization_low."
+}
+
+variable "compute_vm_avg_cpu_utilization_low" {
+  type        = number
+  description = "The average CPU utilization required for virtual machines to be considered infrequently used. This value should be lower than compute_vm_avg_cpu_utilization_high."
+}
+
 locals {
   compute_common_tags = merge(local.thrifty_common_tags, {
     service = "compute"
@@ -16,9 +56,9 @@ benchmark "compute" {
     control.compute_disk_low_usage,
     control.compute_disk_snapshot_storage_standard,
     control.compute_disk_unattached,
-    control.compute_snapshot_age_90,
+    control.compute_snapshot_max_age,
     control.compute_virtual_machine_long_running,
-    control.compute_virtual_machine_low_utilization,
+    control.compute_virtual_machine_low_utilization
   ]
 }
 
@@ -72,7 +112,7 @@ control "compute_disk_high_iops" {
     select
       disk.id as resource,
       case
-        when disk_iops_read_write > 2000 then 'alarm'
+        when disk_iops_read_write > $1 then 'alarm'
         else 'ok'
       end as status,
       disk.title || ' has ' || disk_iops_read_write || ' IOPS.'
@@ -86,13 +126,18 @@ control "compute_disk_high_iops" {
       sub.subscription_id = disk.subscription_id;
   EOT
 
+  param "compute_disk_max_iops" {
+    description = "The maximum IOPS allowed for disks."
+    default     = var.compute_disk_max_iops
+  }
+
   tags = merge(local.compute_common_tags, {
     class = "deprecated"
   })
 }
 
 control "compute_disk_large" {
-  title       = "Disks with over 100 GB should be resized if too large"
+  title       = "Disks should be resized if too large"
   description = "Large disks are unusual, expensive and should be reviewed."
   severity    = "low"
 
@@ -100,7 +145,7 @@ control "compute_disk_large" {
     select
       disk.unique_id as resource,
       case
-        when disk_size_gb <= 100 then 'ok'
+        when disk_size_gb <= $1 then 'ok'
         else 'alarm'
       end as status,
       disk.title || ' is ' || disk_size_gb || ' GB.' as reason,
@@ -112,6 +157,11 @@ control "compute_disk_large" {
     where
       sub.subscription_id = disk.subscription_id;
   EOT
+
+  param "compute_disk_max_size_gb" {
+    description = "The maximum size (GB) allowed for disks."
+    default     = var.compute_disk_max_size_gb
+  }
 
   tags = merge(local.compute_common_tags, {
     class = "deprecated"
@@ -178,8 +228,8 @@ control "compute_disk_unattached" {
   })
 }
 
-control "compute_snapshot_age_90" {
-  title       = "Snapshots created over 90 days ago should be deleted if not required"
+control "compute_snapshot_max_age" {
+  title       = "Old snapshots should be deleted if not required"
   description = "Old snapshots are likely unneeded and costly to maintain."
   severity    = "low"
 
@@ -187,7 +237,7 @@ control "compute_snapshot_age_90" {
     select
       s.unique_id as resource,
       case
-        when time_created > current_timestamp - interval '90 days' then 'ok'
+        when time_created > current_timestamp - interval '$1 days' then 'ok'
         else 'alarm'
       end as status,
       s.title || ' created at ' || time_created || ' (' || date_part('day', now() - time_created) || ' days).'
@@ -200,6 +250,11 @@ control "compute_snapshot_age_90" {
     where
       sub.subscription_id = s.subscription_id;
   EOT
+
+  param "compute_snapshot_age_max_days" {
+    description = "The maximum number of days snapshots can be retained."
+    default     = var.compute_snapshot_age_max_days
+  }
 
   tags = merge(local.compute_common_tags, {
     class = "unused"
@@ -215,7 +270,7 @@ control "compute_virtual_machine_long_running" {
     select
       vm.id as resource,
       case
-        when date_part('day', now() - (s ->> 'time') :: timestamptz) > 90 then 'alarm'
+        when date_part('day', now() - (s ->> 'time') :: timestamptz) > $1 then 'alarm'
         else 'ok'
       end as status,
       vm.title || ' has been running for ' || date_part('day', now() - (s ->> 'time') :: timestamptz) || ' days.'
@@ -227,8 +282,14 @@ control "compute_virtual_machine_long_running" {
       jsonb_array_elements(statuses) as s,
       azure_subscription as sub
     where
-      vm.power_state in ('running', 'starting') and s ->> 'time' is not null;
+      vm.power_state in ('running', 'starting')
+      and s ->> 'time' is not null;
   EOT
+
+  param "compute_running_vm_age_max_days" {
+    description = "The maximum number of days virtual machines are allowed to run."
+    default = var.compute_running_vm_age_max_days
+  }
 
   tags = merge(local.compute_common_tags, {
     class = "deprecated"
@@ -257,8 +318,8 @@ control "compute_virtual_machine_low_utilization" {
       v.id as resource,
       case
         when avg_max is null then 'error'
-        when avg_max < 20 then 'alarm'
-        when avg_max < 35 then 'info'
+        when avg_max < $1 then 'alarm'
+        when avg_max < $2 then 'info'
         else 'ok'
       end as status,
       case
@@ -272,6 +333,16 @@ control "compute_virtual_machine_low_utilization" {
       left join compute_virtual_machine_utilization as u on u.name = v.name
       left join azure_subscription as sub on sub.subscription_id = v.subscription_id;
   EOT
+
+  param "compute_vm_avg_cpu_utilization_low" {
+    description = "The average CPU utilization required for virtual machines to be considered infrequently used. This value should be lower than compute_vm_avg_cpu_utilization_high."
+    default     = var.compute_vm_avg_cpu_utilization_low
+  }
+
+  param "compute_vm_avg_cpu_utilization_high" {
+    description = "The average CPU utilization required for virtual machines to be considered frequently used. This value should be higher than compute_vm_avg_cpu_utilization_low."
+    default     = var.compute_vm_avg_cpu_utilization_high
+  }
 
   tags = merge(local.compute_common_tags, {
     class = "unused"
@@ -321,8 +392,8 @@ control "compute_disk_low_usage" {
     select
       d.id as resource,
       case
-        when avg_max <= 100 then 'alarm'
-        when avg_max <= 500 then 'info'
+        when avg_max <= $1 then 'alarm'
+        when avg_max <= $2 then 'info'
         else 'ok'
       end as status,
       d.name || ' averaging ' || avg_max || ' read and write ops over the last ' || days / 2 || ' days.' as reason,
@@ -332,6 +403,16 @@ control "compute_disk_low_usage" {
       disk_usage as u left join azure_compute_disk as d on u.name = d.name
       left join azure_subscription as sub on sub.subscription_id = d.subscription_id;
   EOT
+
+  param "compute_disk_avg_read_write_ops_low" {
+    description = "The number of average read/write ops required for disks to be considered infrequently used. This value should be lower than compute_disk_avg_read_write_ops_high."
+    default     = var.compute_disk_avg_read_write_ops_low
+  }
+
+  param "compute_disk_avg_read_write_ops_high" {
+    description = "The number of average read/write ops required for disks to be considered frequently used. This value should be higher than compute_disk_avg_read_write_ops_low."
+    default     = var.compute_disk_avg_read_write_ops_high
+  }
 
   tags = merge(local.compute_common_tags, {
     class = "unused"
