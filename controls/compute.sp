@@ -20,7 +20,7 @@ variable "compute_disk_max_size_gb" {
 
 variable "compute_running_vm_age_max_days" {
   type        = number
-  description = "The maximum number of days a virtual machines are allowed to run."
+  description = "The maximum number of days virtual machines are allowed to run."
 }
 
 variable "compute_snapshot_age_max_days" {
