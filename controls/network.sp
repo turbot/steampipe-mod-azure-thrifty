@@ -11,7 +11,7 @@ benchmark "network" {
   tags          = local.network_common_tags
   children = [
     control.network_public_ip_unattached,
-    control.virtual_network_gateway_unused,
+    control.virtual_network_gateway_unused
   ]
 }
 
