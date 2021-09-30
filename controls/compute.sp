@@ -8,7 +8,7 @@ variable "compute_disk_avg_read_write_ops_low" {
   description = "The number of average read/write ops required for disks to be considered infrequently used. This value should be lower than compute_disk_avg_read_write_ops_high."
 }
 
-variable "compute_disk_iops_high" {
+variable "compute_disk_max_iops" {
   type        = number
   description = "The maximum IOPS allowed for disks."
 }
@@ -126,9 +126,9 @@ control "compute_disk_high_iops" {
       sub.subscription_id = disk.subscription_id;
   EOT
 
-  param "compute_disk_iops_high" {
+  param "compute_disk_max_iops" {
     description = "The maximum IOPS allowed for disks."
-    default     = var.compute_disk_iops_high
+    default     = var.compute_disk_max_iops
   }
 
   tags = merge(local.compute_common_tags, {
