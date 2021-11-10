@@ -6,6 +6,8 @@ repository: "https://github.com/turbot/steampipe-mod-azure-thrifty"
 
 Be Thrifty on Azure! This mod checks for unused resources and opportunities to optimize your spend on Azure.
 
+![image](https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure-thrifty-console-graphic.png)
+
 ## References
 
 [Azure](https://azure.microsoft.com) provides on-demand cloud computing platforms and APIs to authenticated customers on a metered pay-as-you-go basis.
