@@ -41,6 +41,31 @@ Your can also run a specific controls:
 steampipe check control.compute_disk_unattached
 ```
 
+### Credentials
+
+This mod uses the credentials configured in the [Steampipe Azure plugin](https://hub.steampipe.io/plugins/turbot/azure).
+
+### Configuration
+
+Several benchmarks have [input variables](https://steampipe.io/docs/using-steampipe/mod-variables) that can be configured to better match your environment and requirements. Each variable has a default defined in its source file, e.g., `controls/sql.sp`, but these can be overwritten in several ways:
+
+- Copy and rename the `steampipe.spvars.example` file to `steampipe.spvars`, and then modify the variable values inside that file
+- Pass in a value on the command line:
+
+  ```shell
+  steampipe check benchmark.compute --var=compute_disk_max_size_gb=100
+  ```
+
+- Set an environment variable:
+
+  ```shell
+  compute_disk_max_size_gb=100 steampipe check control.compute_disk_large
+  ```
+
+  - Note: When using environment variables, if the variable is defined in `steampipe.spvars` or passed in through the command line, either of those will take precedence over the environment variable value. For more information on variable definition precedence, please see the link below.
+
+These are only some of the ways you can set variables. For a full list, please see [Passing Input Variables](https://steampipe.io/docs/using-steampipe/mod-variables#passing-input-variables).
+
 ## Current Thrifty Checks
 
 - Long running **Compute Virtual Machines**
