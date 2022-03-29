@@ -1,41 +1,49 @@
 variable "compute_disk_avg_read_write_ops_high" {
   type        = number
   description = "The number of average read/write ops required for disks to be considered frequently used. This value should be higher than compute_disk_avg_read_write_ops_low."
+  default     = 500
 }
 
 variable "compute_disk_avg_read_write_ops_low" {
   type        = number
   description = "The number of average read/write ops required for disks to be considered infrequently used. This value should be lower than compute_disk_avg_read_write_ops_high."
+  default     = 100
 }
 
 variable "compute_disk_max_iops" {
   type        = number
   description = "The maximum IOPS allowed for disks."
+  default     = 2000
 }
 
 variable "compute_disk_max_size_gb" {
   type        = number
   description = "The maximum size (GB) allowed for disks."
+  default     = 100
 }
 
 variable "compute_running_vm_age_max_days" {
   type        = number
   description = "The maximum number of days virtual machines are allowed to run."
+  default     = 90
 }
 
 variable "compute_snapshot_age_max_days" {
   type        = number
   description = "The maximum number of days snapshots can be retained."
+  default     = 90
 }
 
 variable "compute_vm_avg_cpu_utilization_high" {
   type        = number
   description = "The average CPU utilization required for virtual machines to be considered frequently used. This value should be higher than compute_vm_avg_cpu_utilization_low."
+  default     = 35
 }
 
 variable "compute_vm_avg_cpu_utilization_low" {
   type        = number
   description = "The average CPU utilization required for virtual machines to be considered infrequently used. This value should be lower than compute_vm_avg_cpu_utilization_high."
+  default     = 20
 }
 
 locals {
