@@ -1,6 +1,6 @@
 locals {
-  network_common_tags = merge(local.thrifty_common_tags, {
-    service = "network"
+  network_common_tags = merge(local.azure_thrifty_common_tags, {
+    service = "Azure/Network"
   })
 }
 
@@ -8,11 +8,14 @@ benchmark "network" {
   title         = "Network Checks"
   description   = "Thrifty developers eliminate unused IP addresses and virtual network gateways."
   documentation = file("./controls/docs/network.md")
-  tags          = local.network_common_tags
   children = [
     control.network_public_ip_unattached,
     control.virtual_network_gateway_unused
   ]
+
+  tags = merge(local.network_common_tags, {
+    type = "Benchmark"
+  })
 }
 
 control "network_public_ip_unattached" {

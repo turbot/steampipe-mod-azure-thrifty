@@ -11,8 +11,8 @@ variable "sql_database_age_warning_days" {
 }
 
 locals {
-  sql_common_tags = merge(local.thrifty_common_tags, {
-    service = "sql"
+  sql_common_tags = merge(local.azure_thrifty_common_tags, {
+    service = "Azure/SQLDatabase"
   })
 }
 
@@ -20,10 +20,13 @@ benchmark "sql" {
   title         = "SQL Checks"
   description   = "Thrifty developers checks long running SQL databases should be associated with reserved capacity."
   documentation = file("./controls/docs/sql.md")
-  tags          = local.sql_common_tags
   children = [
     control.sql_database_long_running_reserved_capacity
   ]
+
+  tags = merge(local.sql_common_tags, {
+    type = "Benchmark"
+  })
 }
 
 control "sql_database_long_running_reserved_capacity" {
