@@ -1,3 +1,9 @@
+## v0.7 [2022-05-02]
+
+_Enhancements_
+
+- Added `category`, `service`, and `type` tags to benchmarks and controls. ([#27](https://github.com/turbot/steampipe-mod-azure-thrifty/pull/27))
+
 ## v0.6 [2022-03-23]
 
 _What's new?_
