@@ -1,6 +1,6 @@
 locals {
-  storage_common_tags = merge(local.thrifty_common_tags, {
-    service = "storage"
+  storage_common_tags = merge(local.azure_thrifty_common_tags, {
+    service = "Azure/Storage"
   })
 }
 
@@ -8,10 +8,13 @@ benchmark "storage" {
   title         = "Storage Checks"
   description   = "Thrifty developers ensure their storage accounts have managed lifecycle policies."
   documentation = file("./controls/docs/storage.md")
-  tags          = local.storage_common_tags
   children = [
     control.storage_account_without_lifecycle_policy
   ]
+
+  tags = merge(local.storage_common_tags, {
+    type = "Benchmark"
+  })
 }
 
 control "storage_account_without_lifecycle_policy" {
