@@ -1,3 +1,12 @@
+// Benchmarks and controls for specific services should override the "service" tag
+locals {
+  azure_thrifty_common_tags = {
+    category = "Cost"
+    plugin   = "azure"
+    service  = "Azure"
+  }
+}
+
 mod "azure_thrifty" {
   # hub metadata
   title         = "Azure Thrifty"

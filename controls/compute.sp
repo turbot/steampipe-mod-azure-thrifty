@@ -47,8 +47,8 @@ variable "compute_vm_avg_cpu_utilization_low" {
 }
 
 locals {
-  compute_common_tags = merge(local.thrifty_common_tags, {
-    service = "compute"
+  compute_common_tags = merge(local.azure_thrifty_common_tags, {
+    service = "Azure/Compute"
   })
 }
 
@@ -56,7 +56,6 @@ benchmark "compute" {
   title         = "Compute Checks"
   description   = "Thrifty developers eliminate unused and under-utilized Compute resources."
   documentation = file("./controls/docs/compute.md")
-  tags          = local.compute_common_tags
   children = [
     control.compute_disk_attached_stopped_virtual_machine,
     control.compute_disk_high_iops,
@@ -68,6 +67,10 @@ benchmark "compute" {
     control.compute_virtual_machine_long_running,
     control.compute_virtual_machine_low_utilization
   ]
+
+  tags = merge(local.compute_common_tags, {
+    type = "Benchmark"
+  })
 }
 
 control "compute_disk_attached_stopped_virtual_machine" {
