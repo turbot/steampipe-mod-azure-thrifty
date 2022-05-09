@@ -6,9 +6,9 @@ repository: "https://github.com/turbot/steampipe-mod-azure-thrifty"
 
 Be Thrifty on Azure! This mod checks for unused resources and opportunities to optimize your spend on Azure.
 
-![image](https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure-thrifty-console-graphic.png)
-<TO-DO>
-<TO-D0>
+<img src="https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure_thrifty_dashboard.png" width="50%" type="thumbnail"/>
+<img src="https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure_thrifty_compute_dashboard.png" width="50%" type="thumbnail"/>
+<img src="https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure-thrifty-console-graphic.png" width="50%" type="thumbnail"/>
 
 ## References
 
