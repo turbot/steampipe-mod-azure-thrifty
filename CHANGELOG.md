@@ -1,3 +1,9 @@
+## v0.8 [2022-05-09]
+
+_Enhancements_
+
+- Updated docs/index.md and README with new dashboard screenshots and latest format. ([#31](https://github.com/turbot/steampipe-mod-azure-thrifty/pull/31))
+
 ## v0.7 [2022-05-02]
 
 _Enhancements_
