@@ -2,48 +2,86 @@
 
 An Azure cost savings and waste checking tool.
 
-## Quick start
+Run checks in a dashboard:
 
-1) Download and install Steampipe (https://steampipe.io/downloads). Or use Brew:
+![image](https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure_thrifty_dashboard.png)
 
-```shell
+Or in a terminal:
+
+![image](https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure_thrifty_console_graphic.png)
+
+Includes checks for:
+
+- Long running **Compute Virtual Machines**
+- Unused and oversized **Compute Disks** and **Snapshots**
+- Unattached **Network Public IPs**
+- Long running **SQL Databases**
+- [#TODO List](https://github.com/turbot/steampipe-mod-azure-thrifty/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+
+## Getting started
+
+### Installation
+
+Download and install Steampipe (https://steampipe.io/downloads). Or use Brew:
+
+```sh
 brew tap turbot/tap
 brew install steampipe
-
-steampipe -v
-steampipe version 0.8.2
 ```
 
-Install the Azure plugin
+Install the Azure plugin with [Steampipe](https://steampipe.io):
 
-```shell
+```sh
 steampipe plugin install azure
 ```
 
-Clone this repo and move into the directory:
+Clone:
 
 ```sh
 git clone https://github.com/turbot/steampipe-mod-azure-thrifty.git
 cd steampipe-mod-azure-thrifty
 ```
 
+### Usage
+
+Start your dashboard server to get started:
+
+```sh
+steampipe dashboard
+```
+
+By default, the dashboard interface will then be launched in a new browser
+window at https://localhost:9194. From here, you can run benchmarks by
+selecting one or searching for a specific one.
+
+Instead of running benchmarks in a dashboard, you can also run them within your
+terminal with the `steampipe check` command:
+
 Run all benchmarks:
 
-```shell
+```sh
 steampipe check all
 ```
 
-![image](https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure-thrifty-console-graphic.png)
+Run a single benchmark:
 
-Your can also run a specific controls:
+```sh
+steampipe check benchmark.compute
+```
 
-```shell
+Run a specific control:
+
+```sh
 steampipe check control.compute_disk_unattached
 ```
+
+Different output formats are also available, for more information please see
+[Output Formats](https://steampipe.io/docs/reference/cli/check#output-formats).
 
 ### Credentials
 
 This mod uses the credentials configured in the [Steampipe Azure plugin](https://hub.steampipe.io/plugins/turbot/azure).
+
 
 ### Configuration
 
@@ -52,13 +90,13 @@ Several benchmarks have [input variables](https://steampipe.io/docs/using-steamp
 - Copy and rename the `steampipe.spvars.example` file to `steampipe.spvars`, and then modify the variable values inside that file
 - Pass in a value on the command line:
 
-  ```shell
+  ```sh
   steampipe check benchmark.compute --var=compute_disk_max_size_gb=100
   ```
 
 - Set an environment variable:
 
-  ```shell
+  ```sh
   compute_disk_max_size_gb=100 steampipe check control.compute_disk_large
   ```
 
@@ -66,50 +104,15 @@ Several benchmarks have [input variables](https://steampipe.io/docs/using-steamp
 
 These are only some of the ways you can set variables. For a full list, please see [Passing Input Variables](https://steampipe.io/docs/using-steampipe/mod-variables#passing-input-variables).
 
-## Current Thrifty Checks
-
-- Long running **Compute Virtual Machines**
-- Unused and oversized **Compute Disks** and **Snapshots**
-- Unattached **Network Public IPs**
-- Long running **SQL Databases**
-- [#TODO List](https://github.com/turbot/steampipe-mod-azure-thrifty/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
-
-**Use introspection to view the available controls:**:
-
-```shell
-steampipe query "select resource_name from steampipe_control;"
-```
-
 ## Contributing
 
-Have an idea for a thrifty check but aren't sure how to get started?
+If you have an idea for additional controls or just want to help maintain and extend this mod ([or others](https://github.com/topics/steampipe-mod)) we would love you to join the community and start contributing.
 
-- **[Join our Slack community →](https://join.slack.com/t/steampipe/shared_invite/zt-oij778tv-lYyRTWOTMQYBVAbtPSWs3g)**
-- **[Mod developer guide →](https://steampipe.io/docs/using-steampipe/writing-controls)**
-
-**Prerequisites**:
-
-- [Steampipe installed](https://steampipe.io/downloads)
-- Steampipe Azure plugin installed (see above)
-
-**Fork**:
-Click on the GitHub Fork Widget. (Don't forget to :star: the repo!)
-
-**Clone**:
-
-1. Change the current working directory to the location where you want to put the cloned directory on your local filesystem.
-2. Type the clone command below inserting your GitHub username instead of `YOUR-USERNAME`:
-
-```sh
-git clone git@github.com:YOUR-USERNAME/steampipe-mod-azure-thrifty
-cd steampipe-mod-azure-thrifty
-```
-
-Thanks for getting involved! We would love to have you [join our Slack community](https://join.slack.com/t/steampipe/shared_invite/zt-oij778tv-lYyRTWOTMQYBVAbtPSWs3g) and hang out with other Mod developers.
+- **[Join our Slack community →](https://steampipe.io/community/join)** and hang out with other Mod developers.
 
 Please see the [contribution guidelines](https://github.com/turbot/steampipe/blob/main/CONTRIBUTING.md) and our [code of conduct](https://github.com/turbot/steampipe/blob/main/CODE_OF_CONDUCT.md). All contributions are subject to the [Apache 2.0 open source license](https://github.com/turbot/steampipe-mod-azure-thrifty/blob/main/LICENSE).
 
-`help wanted` issues:
+Want to help but not sure where to start? Pick up one of the `help wanted` issues:
 
 - [Steampipe](https://github.com/turbot/steampipe/labels/help%20wanted)
 - [Azure Thrifty Mod](https://github.com/turbot/steampipe-mod-azure-thrifty/labels/help%20wanted)
