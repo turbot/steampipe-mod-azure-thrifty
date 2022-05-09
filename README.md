@@ -90,13 +90,13 @@ Several benchmarks have [input variables](https://steampipe.io/docs/using-steamp
 - Copy and rename the `steampipe.spvars.example` file to `steampipe.spvars`, and then modify the variable values inside that file
 - Pass in a value on the command line:
 
-  ```shell
+  ```sh
   steampipe check benchmark.compute --var=compute_disk_max_size_gb=100
   ```
 
 - Set an environment variable:
 
-  ```shell
+  ```sh
   compute_disk_max_size_gb=100 steampipe check control.compute_disk_large
   ```
 
