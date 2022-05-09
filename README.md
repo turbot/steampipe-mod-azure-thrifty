@@ -8,7 +8,7 @@ Run checks in a dashboard:
 
 Or in a terminal:
 
-![image](https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure-thrifty-console-graphic.png)
+![image](https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure_thrifty_console_graphic.png)
 
 Includes checks for:
 

@@ -8,7 +8,7 @@ Be Thrifty on Azure! This mod checks for unused resources and opportunities to o
 
 <img src="https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure_thrifty_dashboard.png" width="50%" type="thumbnail"/>
 <img src="https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure_thrifty_compute_dashboard.png" width="50%" type="thumbnail"/>
-<img src="https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure-thrifty-console-graphic.png" width="50%" type="thumbnail"/>
+<img src="https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure_thrifty_console_graphic.png" width="50%" type="thumbnail"/>
 
 ## References
 
@@ -94,13 +94,13 @@ Several benchmarks have [input variables](https://steampipe.io/docs/using-steamp
 - Copy and rename the `steampipe.spvars.example` file to `steampipe.spvars`, and then modify the variable values inside that file
 - Pass in a value on the command line:
 
-  ```shell
+  ```sh
   steampipe check benchmark.compute --var=compute_disk_max_size_gb=100
   ```
 
 - Set an environment variable:
 
-  ```shell
+  ```sh
   compute_disk_max_size_gb=100 steampipe check control.compute_disk_large
   ```
 
