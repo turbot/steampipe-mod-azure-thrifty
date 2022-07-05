@@ -1,4 +1,4 @@
-# Azure Thrifty
+# Azure Thrifty Mod for Steampipe
 
 An Azure cost savings and waste checking tool.
 
