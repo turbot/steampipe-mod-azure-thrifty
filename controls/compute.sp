@@ -293,7 +293,8 @@ control "compute_virtual_machine_long_running" {
       jsonb_array_elements(statuses) as s,
       azure_subscription as sub
     where
-      vm.power_state in ('running', 'starting')
+      sub.subscription_id = vm.subscription_id
+      and vm.power_state in ('running', 'starting')
       and s ->> 'time' is not null;
   EOT
 
