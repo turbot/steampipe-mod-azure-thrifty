@@ -34,8 +34,9 @@ control "network_public_ip_unattached" {
         when ip.ip_configuration_id is null then ip.title  || ' has no associations.'
         else ip.title || ' associated with network interface ' || split_part(ip.ip_configuration_id, '/', 9) || '.'
       end as reason,
-      ip.resource_group,
       sub.display_name as subscription
+      ${local.tag_dimensions_sql}
+      ${replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "ip.")}
     from
       azure_public_ip as ip,
       azure_subscription as sub
@@ -64,8 +65,9 @@ control "virtual_network_gateway_unused" {
         when gateway_connections is null then gateway.title || ' has no connections.'
         else gateway.title || ' has connections.'
       end as reason,
-      gateway.resource_group,
       sub.display_name as subscription
+      ${local.tag_dimensions_sql}
+      ${replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "gateway.")}
     from
       azure_virtual_network_gateway as gateway,
       azure_subscription as sub

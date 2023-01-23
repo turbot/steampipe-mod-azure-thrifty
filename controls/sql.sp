@@ -44,8 +44,9 @@ control "sql_database_long_running_reserved_capacity" {
       end as status,
       db.title || ' has been in use for ' || date_part('day', now() - creation_date) || ' day(s).'
       as reason,
-      db.resource_group,
       sub.display_name as subscription
+      ${local.tag_dimensions_sql}
+      ${replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "db.")}
     from
       azure_sql_database as db,
       azure_subscription as sub

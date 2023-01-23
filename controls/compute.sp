@@ -101,8 +101,9 @@ control "compute_disk_attached_stopped_virtual_machine" {
         when m.virtual_machine_state = 'running' then d.name || ' attached to running virtual machine.'
         else d.name || ' not attached to running virtual machine.'
       end as reason,
-      d.resource_group,
       sub.display_name as subscription
+      ${local.tag_dimensions_sql}
+      ${replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "d.")}
     from
       azure_compute_disk as d
       left join attached_disk_with_vm as m on (d.name = m.os_disk_name or m.data_disk_names ?| array[d.name])
@@ -128,8 +129,9 @@ control "compute_disk_high_iops" {
       end as status,
       disk.title || ' has ' || disk_iops_read_write || ' IOPS.'
       as reason,
-      disk.resource_group,
       sub.display_name as subscription
+      ${local.tag_dimensions_sql}
+      ${replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "disk.")}
     from
       azure_compute_disk as disk,
       azure_subscription as sub
@@ -160,8 +162,9 @@ control "compute_disk_large" {
         else 'alarm'
       end as status,
       disk.title || ' is ' || disk_size_gb || ' GB.' as reason,
-      resource_group,
       sub.display_name as subscription
+      ${local.tag_dimensions_sql}
+      ${replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "disk.")}
     from
       azure_compute_disk as disk,
       azure_subscription as sub
@@ -195,8 +198,9 @@ control "compute_disk_snapshot_storage_standard" {
         when ss.sku_tier = 'Standard' then ss.title || ' has storage type ' || ss.sku_tier || '.'
         else ss.title || ' has storage type ' || ss.sku_tier || '.'
       end as reason,
-      ss.resource_group,
       sub.display_name as subscription
+      ${local.tag_dimensions_sql}
+      ${replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "ss.")}
     from
       azure_compute_snapshot as ss,
       azure_subscription as sub
@@ -225,8 +229,9 @@ control "compute_disk_unattached" {
         when disk.disk_state = 'Unattached' then disk.title || ' has no attachments.'
         else disk.title || ' has attachments.'
       end as reason,
-      disk.resource_group,
       sub.display_name as subscription
+      ${local.tag_dimensions_sql}
+      ${replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "disk.")}
     from
       azure_compute_disk as disk,
       azure_subscription as sub
@@ -248,13 +253,14 @@ control "compute_snapshot_max_age" {
     select
       s.unique_id as resource,
       case
-        when time_created > current_timestamp - interval '$1 days' then 'ok'
+        when date_part('day', now()-time_created) < $1 then 'ok'
         else 'alarm'
       end as status,
       s.title || ' created at ' || time_created || ' (' || date_part('day', now() - time_created) || ' days).'
       as reason,
-      resource_group,
       sub.display_name as subscription
+      ${local.tag_dimensions_sql}
+      ${replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "s.")}
     from
       azure_compute_snapshot as s,
       azure_subscription as sub
@@ -286,8 +292,9 @@ control "compute_virtual_machine_long_running" {
       end as status,
       vm.title || ' has been running for ' || date_part('day', now() - (s ->> 'time') :: timestamptz) || ' days.'
       as reason,
-      vm.resource_group,
       sub.display_name as subscription
+      ${local.tag_dimensions_sql}
+      ${replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "vm.")}
     from
       azure_compute_virtual_machine as vm,
       jsonb_array_elements(statuses) as s,
@@ -338,8 +345,9 @@ control "compute_virtual_machine_low_utilization" {
         when avg_max is null then 'Monitor metrics not available for ' || v.title || '.'
         else v.title || ' averaging ' || avg_max || '% max utilization over the last ' || days || ' days.'
       end as reason,
-      v.resource_group,
       sub.display_name as subscription
+      ${local.tag_dimensions_sql}
+      ${replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "v.")}
     from
       azure_compute_virtual_machine as v
       left join compute_virtual_machine_utilization as u on u.name = v.name
@@ -409,8 +417,9 @@ control "compute_disk_low_usage" {
         else 'ok'
       end as status,
       d.name || ' averaging ' || avg_max || ' read and write ops over the last ' || days / 2 || ' days.' as reason,
-      resource_group,
-      display_name as subscription
+      sub.display_name as subscription
+      ${local.tag_dimensions_sql}
+      ${replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "d.")}
     from
       disk_usage as u left join azure_compute_disk as d on u.name = d.name
       left join azure_subscription as sub on sub.subscription_id = d.subscription_id;
