@@ -1,3 +1,8 @@
+# Dimensions
+# Available dimensions: "connection_name", "resource_group", "region", "subscription" and "subscription_id"
+common_dimensions = [ "resource_group", "subscription"]
+tag_dimensions    = []
+
 # Compute
 compute_disk_avg_read_write_ops_high = 500
 compute_disk_avg_read_write_ops_low  = 100
