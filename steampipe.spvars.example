@@ -1,4 +1,5 @@
 # Dimensions
+# Available dimensions: "connection_name", "resource_group", "region", "subscription" and "subscription_id"
 common_dimensions = [ "resource_group", "subscription"]
 tag_dimensions    = []
 
