@@ -14,23 +14,23 @@ variable "common_dimensions" {
   # - resource_group
   # - connection_name (_ctx ->> 'connection_name')
   # - region
-  # - subscription_id
-  default     = [ "resource_group", "region", "connection_name","subscription_id" ]
+  # - subscription
+  default     = [ "resource_group", "region", "connection_name", "subscription" ]
 }
 
 variable "tag_dimensions" {
   type        = list(string)
   description = "A list of tags to add as dimensions to each control."
-  default     = [ "Owner" ]
+  default     = []
 }
 
 locals {
 
   common_dimensions_qualifier_sql = <<-EOQ
-  %{~ if contains(var.common_dimensions, "connection_name") }, __QUALIFIER___ctx ->> 'connection_name'%{ endif ~}
+  %{~ if contains(var.common_dimensions, "connection_name") }, __QUALIFIER___ctx ->> 'connection_name' as connection_name%{ endif ~}
   %{~ if contains(var.common_dimensions, "region") }, __QUALIFIER__region%{ endif ~}
   %{~ if contains(var.common_dimensions, "resource_group") }, __QUALIFIER__resource_group%{ endif ~}
-  %{~ if contains(var.common_dimensions, "subscription_id") }, __QUALIFIER__subscription_id%{ endif ~}
+  %{~ if contains(var.common_dimensions, "subscription") }, __QUALIFIER__subscription%{ endif ~}
   EOQ
 
   tag_dimensions_sql = <<-EOQ
