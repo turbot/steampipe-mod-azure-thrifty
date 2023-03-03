@@ -1,6 +1,6 @@
 # Dimensions
-common_dimensions = [ "resource_group", "region", "connection_name", "subscription_id"]
-tag_dimensions    = [ "Environment", "Owner" ]
+common_dimensions = [ "resource_group", "subscription"]
+tag_dimensions    = []
 
 # Compute
 compute_disk_avg_read_write_ops_high = 500

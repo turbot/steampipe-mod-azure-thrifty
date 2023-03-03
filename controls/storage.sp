@@ -34,10 +34,10 @@ control "storage_account_without_lifecycle_policy" {
         when lifecycle_management_policy -> 'properties' -> 'policy' -> 'rules' is null then ac.title || ' has no lifecycle policy.'
         when lifecycle_management_policy -> 'properties' -> 'policy' -> 'rules' @> '[{"enabled":true}]' then ac.title || ' has active lifecycle policy.'
         else ac.title || ' has no active lifecycle policy.'
-      end as reason,
-      sub.display_name as subscription
+      end as reason
       ${local.tag_dimensions_sql}
       ${replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "ac.")}
+      ${replace(local.common_dimensions_subscription_sql, "__QUALIFIER__", "sub.")}
     from
       azure_storage_account as ac
       left join azure_subscription as sub on ac.subscription_id = sub.subscription_id;

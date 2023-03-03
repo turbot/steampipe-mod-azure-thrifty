@@ -30,7 +30,11 @@ locals {
   %{~ if contains(var.common_dimensions, "connection_name") }, __QUALIFIER___ctx ->> 'connection_name' as connection_name%{ endif ~}
   %{~ if contains(var.common_dimensions, "region") }, __QUALIFIER__region%{ endif ~}
   %{~ if contains(var.common_dimensions, "resource_group") }, __QUALIFIER__resource_group%{ endif ~}
-  %{~ if contains(var.common_dimensions, "subscription") }, __QUALIFIER__subscription%{ endif ~}
+  %{~ if contains(var.common_dimensions, "subscription_id") }, __QUALIFIER__subscription_id%{ endif ~}
+  EOQ
+
+  common_dimensions_qualifier_subscription_sql = <<-EOQ
+  %{~ if contains(var.common_dimensions, "subscription") }, __QUALIFIER__display_name as subscription%{ endif ~}
   EOQ
 
   tag_dimensions_sql = <<-EOQ
@@ -42,7 +46,7 @@ locals {
 locals {
 
   common_dimensions_sql = replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "")
-
+  common_dimensions_subscription_sql = replace(local.common_dimensions_qualifier_subscription_sql, "__QUALIFIER__", "")
 }
 
 mod "azure_thrifty" {
