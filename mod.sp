@@ -15,6 +15,7 @@ variable "common_dimensions" {
   # - region
   # - resource_group
   # - subscription
+  # - subscription_id
   default     = [ "resource_group", "subscription" ]
 }
 
