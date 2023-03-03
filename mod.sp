@@ -11,11 +11,11 @@ variable "common_dimensions" {
   type        = list(string)
   description = "A list of common dimensions to add to each control."
   # Define which common dimensions should be added to each control.
-  # - resource_group
   # - connection_name (_ctx ->> 'connection_name')
   # - region
+  # - resource_group
   # - subscription
-  default     = [ "resource_group", "region", "connection_name", "subscription" ]
+  default     = [ "resource_group", "subscription" ]
 }
 
 variable "tag_dimensions" {
