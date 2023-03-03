@@ -1,3 +1,14 @@
+## v0.9 [2023-03-03]
+
+_What's new?_
+
+- Added `tags` as dimensions to group and filter findings. (see [var.tag_dimensions](https://hub.steampipe.io/mods/turbot/azure_thrifty/variables)) ([#37](https://github.com/turbot/steampipe-mod-azure-thrifty/pull/37))
+- Added `connection_name`, `region` and `subscription_id` in the common dimensions to group and filter findings. (see [var.common_dimensions](https://hub.steampipe.io/mods/turbot/azure_thrifty/variables)) ([#37](https://github.com/turbot/steampipe-mod-azure-thrifty/pull/37))
+
+_Bug fixes_
+
+- Fixed the inline query of `compute_virtual_machine_long_running` control to remove duplicate results. ([#35](https://github.com/turbot/steampipe-mod-azure-thrifty/pull/35)) (Thanks [@JoshRosen](https://github.com/JoshRosen) for the contribution!)
+
 ## v0.8 [2022-05-09]
 
 _Enhancements_

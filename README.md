@@ -82,7 +82,6 @@ Different output formats are also available, for more information please see
 
 This mod uses the credentials configured in the [Steampipe Azure plugin](https://hub.steampipe.io/plugins/turbot/azure).
 
-
 ### Configuration
 
 Several benchmarks have [input variables](https://steampipe.io/docs/using-steampipe/mod-variables) that can be configured to better match your environment and requirements. Each variable has a default defined in its source file, e.g., `controls/sql.sp`, but these can be overwritten in several ways:
@@ -103,6 +102,31 @@ Several benchmarks have [input variables](https://steampipe.io/docs/using-steamp
   - Note: When using environment variables, if the variable is defined in `steampipe.spvars` or passed in through the command line, either of those will take precedence over the environment variable value. For more information on variable definition precedence, please see the link below.
 
 These are only some of the ways you can set variables. For a full list, please see [Passing Input Variables](https://steampipe.io/docs/using-steampipe/mod-variables#passing-input-variables).
+
+### Common and Tag Dimensions
+
+The benchmark queries use common properties (like `connection_name`, `resource_group`, `region`, `subscription` and `subscription_id`) and tags that are defined in the form of a default list of strings in the `mod.sp` file. These properties can be overwritten in several ways:
+
+- Copy and rename the `steampipe.spvars.example` file to `steampipe.spvars`, and then modify the variable values inside that file
+- Pass in a value on the command line:
+
+  ```shell
+  steampipe check benchmark.compute --var 'common_dimensions=["connection_name", "resource_group", "subscription"]'
+  ```
+
+  ```shell
+  steampipe check benchmark.compute --var 'tag_dimensions=[ "Department", "Environment"]'
+  ```
+
+- Set an environment variable:
+
+  ```shell
+  SP_VAR_common_dimensions='["connection_name", "resource_group", "subscription"]' steampipe check control.compute_disk_large
+  ```
+
+  ```shell
+  SP_VAR_tag_dimensions='[ "Department", "Environment"]' steampipe check control.compute_disk_large
+  ```
 
 ## Contributing
 
