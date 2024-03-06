@@ -9,7 +9,7 @@ mod "azure_thrifty" {
 
   opengraph {
     title       = "Powerpipe mod for Azure Thrifty"
-    description = "Are you a Thrifty Azure dev? This mod checks your Azure subscription(s) for unused and under-utilized resources using Powerpipe and Steampipe."
+    description = "Are you a Thrifty Azure developer? This mod checks your Azure subscription(s) for unused and under-utilized resources using Powerpipe and Steampipe."
     image       = "/images/mods/turbot/azure-thrifty-social-graphic.png"
   }
 }

@@ -1,18 +1,19 @@
 # Azure Thrifty Mod for Powerpipe
 
 > [!IMPORTANT]
-> Steampipe mods are [migrating to Powerpipe format](https://powerpipe.io) to gain new features. This mod currently works with both Steampipe and Powerpipe, but will only support Powerpipe from v1.x onward.
+> [Powerpipe](https://powerpipe.io) is now the preferred way to run this mod! [Migrating from Steampipe →](https://powerpipe.io/blog/migrating-from-steampipe)
+>
+> All v0.x versions of this mod will work in both Steampipe and Powerpipe, but v1.0.0 onwards will be in Powerpipe format only.
 
 An Azure cost savings and waste checking tool.
 
 Run checks in a dashboard:
 
-<!-- ![image](https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure_thrifty_dashboard.png) -->
-![image](https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/add-new-checks/docs/azure_thrifty_dashboard.png)
+![image](https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure_thrifty_dashboard.png)
+
 Or in a terminal:
 
-<!-- ![image](https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure_thrifty_compute_console.png) -->
-![image](https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/add-new-checks/docs/azure_thrifty_compute_console.png)
+![image](https://raw.githubusercontent.com/turbot/steampipe-mod-azure-thrifty/main/docs/azure_thrifty_compute_console.png)
 
 Includes checks for:
 
@@ -90,24 +91,29 @@ powerpipe benchmark run azure_thrifty.benchmark.compute
 Different output formats are also available, for more information please see
 [Output Formats](https://powerpipe.io/docs/reference/cli/benchmark#output-formats).
 
-### Configuration
+### Configure Variables
 
 Several benchmarks have [input variables](https://powerpipe.io/docs/build/mod-variables#input-variables) that can be configured to better match your environment and requirements. Each variable has a default defined in its source file, e.g., `controls/sql.sp`, but these can be overwritten in several ways:
 
-- Copy and rename the `powerpipe.ppvars.example` file to `powerpipe.ppvars`, and then modify the variable values inside that file
-- Pass in a value on the command line:
+It's easiest to setup your vars file, starting with the sample:
 
-  ```sh
-  powerpipe benchmark run azure_thrifty.benchmark.compute --var=compute_disk_max_size_gb=100
-  ```
+```sh
+cp steampipe.spvars.example steampipe.spvars
+vi steampipe.spvars
+```
 
-- Set an environment variable:
+Alternatively you can pass variables on the command line:
 
-  ```sh
-  export PP_VAR_compute_disk_max_size_gb=100
-  powerpipe benchmark run azure_thrifty.benchmark.compute
-  ```
-  - Note: When using environment variables, if the variable is defined in `powerpipe.ppvars` or passed in through the command line, either of those will take precedence over the environment variable value. For more information on variable definition precedence, please see the link below.
+```sh
+powerpipe benchmark run azure_thrifty.benchmark.compute --var=compute_disk_max_size_gb=100
+```
+
+Or through environment variables:
+
+```sh
+export PP_VAR_compute_disk_max_size_gb=100
+powerpipe benchmark run azure_thrifty.benchmark.compute
+```
 
 These are only some of the ways you can set variables. For a full list, please see [Passing Input Variables](https://powerpipe.io/docs/build/mod-variables#passing-input-variables).
 
@@ -118,8 +124,8 @@ The benchmark queries use common properties (like `connection_name`, `resource_g
 It's easiest to setup your vars file, starting with the sample:
 
 ```sh
-cp powerpipe.ppvar.example powerpipe.ppvars
-vi powerpipe.ppvars
+cp steampipe.spvars.example steampipe.spvars
+vi steampipe.spvars
 ```
 
 Alternatively you can pass variables on the command line:
