@@ -65,7 +65,8 @@ benchmark "compute" {
     control.compute_disk_unattached,
     control.compute_snapshot_max_age,
     control.compute_virtual_machine_long_running,
-    control.compute_virtual_machine_low_utilization
+    control.compute_virtual_machine_low_utilization,
+    control.compute_virtual_machine_scale_set_unused
   ]
 
   tags = merge(local.compute_common_tags, {
@@ -434,6 +435,50 @@ control "compute_disk_low_usage" {
     description = "The number of average read/write ops required for disks to be considered frequently used. This value should be higher than compute_disk_avg_read_write_ops_low."
     default     = var.compute_disk_avg_read_write_ops_high
   }
+
+  tags = merge(local.compute_common_tags, {
+    class = "unused"
+  })
+}
+
+control "compute_virtual_machine_scale_set_unused" {
+  title       = "Compute virtual machine scale sets which are not attached to any instance should be reviewed"
+  description = "Virtual machine scale sets that are unused should be deleted."
+  severity    = "low"
+
+  sql = <<-EOT
+    with scale_set_vm_count as (
+      select
+        count(*),
+        scale_set_name,
+        resource_group,
+        region,
+        subscription_id
+      from
+        azure_compute_virtual_machine_scale_set_vm
+      group by
+        scale_set_name,
+        resource_group,
+        region,
+        subscription_id
+    ) select
+        s.id as resource,
+      case
+        when vm.scale_set_name is null then 'alarm'
+        else 'ok'
+      end as status,
+      case
+        when vm.scale_set_name is null then s.title || ' is useless.'
+        else s.title || ' has instances attached.'
+      end as reason
+      ${local.tag_dimensions_sql}
+      ${replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "s.")}
+      ${replace(local.common_dimensions_subscription_sql, "__QUALIFIER__", "sub.")}
+    from
+      azure_compute_virtual_machine_scale_set as s
+      left join scale_set_vm_count as vm on vm.scale_set_name = s.name and vm.resource_group = s.resource_group and vm.region = s.region
+      left join azure_subscription as sub on sub.subscription_id = s.subscription_id;
+  EOT
 
   tags = merge(local.compute_common_tags, {
     class = "unused"
