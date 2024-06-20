@@ -26,16 +26,18 @@ control "app_service_plan_unused" {
     select
       p.id as resource,
     case
-      when apps is null then 'alarm'
+      when apps is null and sku_tier <> 'Free' then 'alarm'
+      when sku_tier = 'Free' then 'ok'
       else 'ok'
     end as status,
     case
-      when apps is null then p.title || ' is useless.'
+      when apps is null and sku_tier <> 'Free' then p.title || ' is useless.'
+      when sku_tier = 'Free' then p.title || ' is of free tier.'
       else p.title || ' has apps attached.'
     end as reason
-      ${local.tag_dimensions_sql}
-      ${replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "p.")}
-      ${replace(local.common_dimensions_subscription_sql, "__QUALIFIER__", "sub.")}
+      --${local.tag_dimensions_sql}
+      --${replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "p.")}
+      --${replace(local.common_dimensions_subscription_sql, "__QUALIFIER__", "sub.")}
     from
       azure_app_service_plan as p
       left join azure_subscription as sub on sub.subscription_id = p.subscription_id;
