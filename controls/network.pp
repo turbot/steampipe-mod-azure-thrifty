@@ -12,7 +12,8 @@ benchmark "network" {
     control.network_public_ip_unattached,
     control.virtual_network_gateway_unused,
     control.network_private_endpoint_unused,
-    control.network_application_gateway_optimization
+    control.network_application_gateway_optimization,
+    control.network_load_balancer_rules_optimization
   ]
 
   tags = merge(local.network_common_tags, {
@@ -142,6 +143,56 @@ control "network_application_gateway_optimization" {
     where
       sub.subscription_id = ag.subscription_id
       and ag.operational_state = 'Running';
+  EOT
+
+  tags = merge(local.network_common_tags, {
+    class = "optimization"
+  })
+}
+
+control "network_load_balancer_rules_optimization" {
+  title       = "Standard load balancer rules should be optimized"
+  description = "Standard SKU load balancers with more than 5 rules should be reviewed for optimization opportunities, as too many rules can lead to management complexity and potential performance impacts."
+  severity    = "low"
+
+  sql = <<-EOT
+    with lb_rule_counts as (
+      select 
+        load_balancer_name,
+        count(*) as rule_count,
+        array_agg(name) as rule_names,
+        subscription_id,
+        resource_group
+      from 
+        azure_lb_rule
+      group by 
+        load_balancer_name,
+        subscription_id,
+        resource_group
+    )
+    select 
+      lb.id as resource,
+      case
+        when lb.sku_name = 'Standard' and rc.rule_count > 5 then 'alarm'
+        else 'ok'
+      end as status,
+      case
+        when lb.sku_name = 'Standard' and rc.rule_count > 5 then lb.name || ' (Standard SKU) has ' || rc.rule_count || ' rules (' || array_to_string(rc.rule_names, ', ') || ').'
+        when lb.sku_name = 'Standard' then lb.name || ' (Standard SKU) has ' || coalesce(rc.rule_count, 0) || ' rules.'
+        else lb.name || ' is not a Standard SKU load balancer.'
+      end as reason
+      ${local.tag_dimensions_sql}
+      ${replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "lb.")}
+      ${replace(local.common_dimensions_subscription_sql, "__QUALIFIER__", "sub.")}
+    from 
+      azure_lb as lb
+      left join lb_rule_counts as rc on 
+        lb.name = rc.load_balancer_name 
+        and lb.subscription_id = rc.subscription_id 
+        and lb.resource_group = rc.resource_group,
+      azure_subscription as sub
+    where
+      sub.subscription_id = lb.subscription_id;
   EOT
 
   tags = merge(local.network_common_tags, {
