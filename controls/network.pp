@@ -6,12 +6,13 @@ locals {
 
 benchmark "network" {
   title         = "Network Checks"
-  description   = "Thrifty developers eliminate unused IP addresses and virtual network gateways."
+  description   = "Thrifty developers eliminate unused IP addresses, virtual network gateways, and optimize Application Gateway configurations."
   documentation = file("./controls/docs/network.md")
   children = [
     control.network_public_ip_unattached,
     control.virtual_network_gateway_unused,
-    control.network_private_endpoint_unused
+    control.network_private_endpoint_unused,
+    control.network_application_gateway_optimization
   ]
 
   tags = merge(local.network_common_tags, {
@@ -109,5 +110,41 @@ control "network_private_endpoint_unused" {
 
   tags = merge(local.compute_common_tags, {
     class = "unused"
+  })
+}
+
+control "network_application_gateway_optimization" {
+  title       = "Application Gateway SKU and capacity should be optimized"
+  description = "Application Gateways should use autoscaling when supported by the SKU tier, and fixed capacity should be reviewed for optimization opportunities."
+  severity    = "low"
+
+  sql = <<-EOT
+    select
+      ag.id as resource,
+      case
+        when ag.autoscale_configuration is not null then 'ok'
+        when ag.sku->>'tier' in ('Standard_v2', 'WAF_v2') and ag.autoscale_configuration is null then 'alarm'
+        when (ag.sku->>'capacity')::int > 2 and ag.autoscale_configuration is null then 'alarm'
+        else 'ok'
+      end as status,
+      case
+        when ag.autoscale_configuration is not null then ag.name || ' has autoscaling enabled with min capacity ' || (ag.autoscale_configuration->>'minCapacity') || ' and max capacity ' || (ag.autoscale_configuration->>'maxCapacity') || '.'
+        when ag.sku->>'tier' in ('Standard_v2', 'WAF_v2') then ag.name || ' uses ' || (ag.sku->>'tier') || ' tier which supports autoscaling but it is not enabled.'
+        when (ag.sku->>'capacity')::int > 2 and ag.autoscale_configuration is null then ag.name || ' has high fixed capacity (' || (ag.sku->>'capacity') || ') without autoscaling.'
+        else ag.name || ' has appropriate capacity configuration.'
+      end as reason
+      ${local.tag_dimensions_sql}
+      ${replace(local.common_dimensions_qualifier_sql, "__QUALIFIER__", "ag.")}
+      ${replace(local.common_dimensions_subscription_sql, "__QUALIFIER__", "sub.")}
+    from
+      azure_application_gateway as ag,
+      azure_subscription as sub
+    where
+      sub.subscription_id = ag.subscription_id
+      and ag.operational_state = 'Running';
+  EOT
+
+  tags = merge(local.network_common_tags, {
+    class = "optimization"
   })
 }
