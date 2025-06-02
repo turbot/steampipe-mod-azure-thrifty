@@ -6,7 +6,7 @@ locals {
 
 benchmark "network" {
   title         = "Network Checks"
-  description   = "Thrifty developers eliminate unused IP addresses, virtual network gateways, and optimize Application Gateway configurations."
+  description   = "Thrifty developers eliminate unused network resources like IP addresses and gateways, ensure proper backend configurations for load balancers, and enable Application Gateway autoscaling when supported."
   documentation = file("./controls/docs/network.md")
   children = [
     control.network_application_gateway_with_autoscaling_disabled,
