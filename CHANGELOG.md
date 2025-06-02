@@ -1,3 +1,13 @@
+## v1.1.0 [2025-06-02]
+
+_What's new?_
+
+- New controls added:
+  - `network_application_gateway_with_autoscaling_disabled`
+  - `network_load_balancer_with_duplicate_rules`
+  - `network_load_balancer_with_missing_backend`
+  - `network_load_balancer_with_nonexistent_backend`
+
 ## v1.0.1 [2024-10-24]
 
 _Bug fixes_
