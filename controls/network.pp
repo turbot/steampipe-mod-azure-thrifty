@@ -10,9 +10,9 @@ benchmark "network" {
   documentation = file("./controls/docs/network.md")
   children = [
     control.network_application_gateway_with_autoscaling_disabled,
-    control.network_load_balancer_with_missing_backend,
-    control.network_load_balancer_with_invalid_backend,
     control.network_load_balancer_with_duplicate_rules,
+    control.network_load_balancer_with_missing_backend,
+    control.network_load_balancer_with_nonexistent_backend,
     control.network_private_endpoint_unused,
     control.network_public_ip_unattached,
     control.virtual_network_gateway_unused
@@ -183,8 +183,8 @@ control "network_load_balancer_with_missing_backend" {
   })
 }
 
-control "network_load_balancer_with_invalid_backend" {
-  title       = "Network Load Balancer with Invalid Backend"
+control "network_load_balancer_with_nonexistent_backend" {
+  title       = "Network Load Balancer with Non-existent Backend"
   description = "Load balancer rules pointing to non-existent backend pools waste resources and should be corrected or removed to optimize costs."
   severity    = "low"
 

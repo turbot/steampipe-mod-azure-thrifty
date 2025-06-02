@@ -22,7 +22,7 @@ Application Gateways should have autoscaling enabled when supported by their SKU
 
 Load balancer rules that have no backend pool configured are ineffective and waste resources. These rules should be identified and removed as they cannot serve any traffic but still contribute to the complexity and management overhead of your load balancer configuration. Regular auditing and removal of such rules helps maintain a clean and cost-effective load balancer setup.
 
-### Network Load Balancer with Invalid Backend
+### Network Load Balancer with Non-existent Backend
 
 Load balancer rules that point to non-existent backend pools waste resources and should be corrected or removed. These rules can occur when backend pools are deleted but their associated rules remain. Such misconfigured rules can cause confusion, complicate troubleshooting, and waste resources. Identifying and fixing these rules ensures your load balancer configuration remains efficient and cost-effective.
 
