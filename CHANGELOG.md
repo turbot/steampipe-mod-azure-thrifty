@@ -1,8 +1,8 @@
-## v1.1.0 [2025-06-02]
+## v1.1.0 [2025-06-04]
 
 _What's new?_
 
-- New controls added:
+- New controls added: ([#52](https://github.com/turbot/steampipe-mod-azure-thrifty/pull/52))
   - `network_application_gateway_with_autoscaling_disabled`
   - `network_load_balancer_with_duplicate_rules`
   - `network_load_balancer_with_missing_backend`
